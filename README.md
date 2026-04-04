@@ -150,6 +150,49 @@ from a shell, or with a `.top` / `.tdr` script as input.
 
 ---
 
+## Testing
+
+This repository includes a small `CTest`-based smoke test for the built `td`
+executable.
+
+To configure with tests enabled:
+
+```sh
+cmake -S . -B build \
+  -DBUILD_TESTING=ON
+```
+
+To run the smoke test:
+
+```sh
+ctest --test-dir build --output-on-failure
+```
+
+The current smoke test runs `td` non-interactively with a small input file and
+checks that the program completes without reporting a Topdrawer or UGS error.
+
+---
+
+## CI
+
+GitHub Actions runs a Linux CI workflow for pull requests and pushes to `main`.
+The workflow:
+
+- Installs system build dependencies and X11 development packages.
+- Clones and installs `f2c` and `ugs` into a temporary prefix.
+- Configures this repository with `-DNET_FETCH=ON` and `-DBUILD_TESTING=ON`.
+- Builds `td` with Ninja.
+- Runs the `CTest` smoke test.
+
+The CI workflow is defined in:
+
+- `.github/workflows/ci.yml`
+
+This is primarily a maintainer-facing verification path, but it also serves as a
+reference for a clean bootstrap on Ubuntu.
+
+---
+
 ## Source patching policy
 
 The upstream Topdrawer sources contain a number of constructs that are problematic
@@ -231,6 +274,10 @@ If `find_package(ugs)` or `find_package(f2c)` fails:
   cmake -S . -B build -DCMAKE_PREFIX_PATH="/opt/ugs;$HOME/.local"
   ```
 
+If you want a clean local bootstrap similar to CI, build and install `f2c` and
+`ugs` first into the same prefix, then point this repository at that prefix via
+`CMAKE_PREFIX_PATH`.
+
 ### X11 headers or libraries missing
 
 If CMake cannot find X11 components (`Xt`, `Xmu`, `Xaw`, …), install the X11
@@ -248,4 +295,3 @@ When changing how Topdrawer is built or patched, please:
 - Keep the CMake interface and target names (`td`, `misc`, `ugs::ugs`,
   `f2c::f2c_runtime`) stable where possible, to make the project easy to
 use from tooling and downstream scripts.
-
