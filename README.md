@@ -169,10 +169,10 @@ ctest --test-dir build --output-on-failure
 ```
 
 The current smoke test suite runs `td` non-interactively across a small set of
-curated inputs and checks that each case completes without reporting a
-Topdrawer or UGS error. The suite currently covers basic 2D plotting,
-multi-plot input, mesh/scatter paths, 3D plotting paths, and font-oriented
-rendering paths.
+repository-managed minimal inputs and checks that each case completes without
+reporting a Topdrawer or UGS error. The suite currently covers basic 2D
+plotting, error-bar and spline input, multi-plot input, mesh/scatter paths,
+3D plotting paths, and font-oriented rendering paths.
 
 ---
 
@@ -298,3 +298,9 @@ When changing how Topdrawer is built or patched, please:
 - Keep the CMake interface and target names (`td`, `misc`, `ugs::ugs`,
   `f2c::f2c_runtime`) stable where possible, to make the project easy to
 use from tooling and downstream scripts.
+
+---
+
+## License
+
+This repository is distributed under the MIT License. See `LICENSE` for details.
