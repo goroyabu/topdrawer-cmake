@@ -1,1 +1,1 @@
-Plot +0 Done\.
+Plot +[0-9]+ Done\.
