@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(td VERSION 0.1.0 LANGUAGES C Fortran)
+project(td VERSION 0.2.0 LANGUAGES C Fortran)
 
 include(GNUInstallDirs)
 
