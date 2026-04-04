@@ -136,4 +136,6 @@ td_replace_string("${_td_src_dir}/t2del.f"
 td_insert_before_token("${_td_src_dir}/td.f"
     "C     CALL T2_VIRT(ISIZE)"
     "      LOGICAL T2_VIRT,DMMY")
-
+td_replace_string("${_td_misc_dir}/minuit.f"
+    "      LOGICAL   LWARN, LREPOR, LIMSET, LNOLIM, LNEWMN, LPHEAD\nC\n      CFROM = 'SET LIM '"
+    "      LOGICAL   LWARN, LREPOR, LIMSET, LNOLIM, LNEWMN, LPHEAD\n      EXTERNAL FCN,FUTIL\nC\n      CFROM = 'SET LIM '")

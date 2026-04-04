@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            gfortran \
+            libx11-dev \
+            libxmu-dev \
+            libxaw7-dev \
+            libxt-dev \
+            libice-dev \
+            libsm-dev
+
+      - name: Build and install f2c
+        run: |
+          git clone --depth=1 https://github.com/goroyabu/f2c.git "$RUNNER_TEMP/f2c"
+          cmake -S "$RUNNER_TEMP/f2c" -B "$RUNNER_TEMP/f2c-build" \
+            -G Ninja \
+            -DNET_FETCH=ON \
+            -DBUILD_TESTING=OFF \
+            -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/prefix"
+          cmake --build "$RUNNER_TEMP/f2c-build" --parallel
+          cmake --install "$RUNNER_TEMP/f2c-build"
+
+      - name: Build and install ugs
+        run: |
+          git clone --depth=1 https://github.com/goroyabu/ugs.git "$RUNNER_TEMP/ugs"
+          cmake -S "$RUNNER_TEMP/ugs" -B "$RUNNER_TEMP/ugs-build" \
+            -G Ninja \
+            -DNET_FETCH=ON \
+            -DBUILD_TESTING=OFF \
+            -DUGS_ENABLE_GUI_SMOKE=OFF \
+            -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/prefix"
+          cmake --build "$RUNNER_TEMP/ugs-build" --parallel
+          cmake --install "$RUNNER_TEMP/ugs-build"
+
+      - name: Configure td
+        run: |
+          cmake -S . -B build \
+            -G Ninja \
+            -DNET_FETCH=ON \
+            -DBUILD_TESTING=ON \
+            -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/prefix"
+
+      - name: Build td
+        run: cmake --build build --parallel
+
+      - name: Test td
+        run: ctest --test-dir build --output-on-failure

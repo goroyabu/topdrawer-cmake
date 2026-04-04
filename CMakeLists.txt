@@ -87,10 +87,25 @@ foreach(src_name IN LISTS misc_source_names)
     list(APPEND misc_source_paths "${TOPDRAWER_SOURCE_ROOT}/${src_name}")
 endforeach()
 
+set(td_gnu_fortran_options
+    -O2
+    -std=legacy
+    -fbackslash
+    -fallow-invalid-boz
+    -fallow-argument-mismatch
+    -fno-automatic
+    -finit-local-zero
+    -funroll-loops
+    -fomit-frame-pointer
+    -ftree-vectorize
+)
+
 add_library(misc STATIC ${misc_source_paths})
 target_compile_options(misc PRIVATE
-    $<$<AND:$<PLATFORM_ID:Darwin>,$<COMPILE_LANGUAGE:Fortran>>:
-        -O2 -std=legacy -fbackslash -fallow-invalid-boz -fno-automatic -finit-local-zero -funroll-loops -fomit-frame-pointer -ftree-vectorize -flat_namespace>
+    $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
+        ${td_gnu_fortran_options}>
+    $<$<AND:$<PLATFORM_ID:Darwin>,$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
+        -flat_namespace>
     $<$<AND:$<PLATFORM_ID:Darwin>,$<COMPILE_LANGUAGE:C>>: -O2 -DIUCLC=0001000 -ftree-vectorize>
 )
 target_include_directories(misc PRIVATE ${X11_INCLUDE_DIR} ${TOPDRAWER_SRC_DIR})
@@ -118,8 +133,10 @@ endforeach()
 
 add_executable(${PROJECT_NAME} ${td_source_paths})
 target_compile_options(${PROJECT_NAME} PRIVATE
-    $<$<AND:$<PLATFORM_ID:Darwin>,$<COMPILE_LANGUAGE:Fortran>>:
-        -O2 -std=legacy -fbackslash -fallow-invalid-boz -fno-automatic -finit-local-zero -funroll-loops -fomit-frame-pointer -ftree-vectorize -flat_namespace>
+    $<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
+        ${td_gnu_fortran_options}>
+    $<$<AND:$<PLATFORM_ID:Darwin>,$<COMPILE_LANGUAGE:Fortran>,$<Fortran_COMPILER_ID:GNU>>:
+        -flat_namespace>
     $<$<AND:$<PLATFORM_ID:Darwin>,$<COMPILE_LANGUAGE:C>>: -O2 -DIUCLC=0001000 -ftree-vectorize>
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${X11_INCLUDE_DIR} ${TOPDRAWER_SRC_DIR})
@@ -163,7 +180,7 @@ add_download_cleanup_target(clean_downloads)
 # ---------------------------------------------------------------------------
 # Test
 # ---------------------------------------------------------------------------
-# include(CTest)
-# if(BUILD_TESTING AND EXISTS "${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt")
-#     add_subdirectory(tests)
-# endif()
+include(CTest)
+if(BUILD_TESTING AND EXISTS "${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt")
+    add_subdirectory(tests)
+endif()
