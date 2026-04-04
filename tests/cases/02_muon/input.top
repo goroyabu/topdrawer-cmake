@@ -1,0 +1,16 @@
+TITLE TOP 'E687 MUON FLUX'
+TITLE LEFT 'K-muons / square meter / 10^12 protons'
+TITLE BOTTOM 'Counter height (inches from floor)'
+TITLE 6.7 6 'Target IN'
+TITLE 6.7 4 'Target OUT'
+SET ORDER X Y DY
+SET LIMITS Y 0 TO 1500
+135.  580. 58.
+102. 1170. 117.
+ 51.  890. 89.
+ 20.  540. 54.
+PLOT
+JOIN SPLINE
+135. 92. 9.2; 102. 145. 14.5; 51. 317. 32.; 20. 355. 36.
+PLOT
+JOIN SPLINE DOTS
