@@ -152,8 +152,8 @@ from a shell, or with a `.top` / `.tdr` script as input.
 
 ## Testing
 
-This repository includes a small `CTest`-based smoke test for the built `td`
-executable.
+This repository includes a small `CTest`-based smoke test suite for the built
+`td` executable.
 
 To configure with tests enabled:
 
@@ -162,14 +162,17 @@ cmake -S . -B build \
   -DBUILD_TESTING=ON
 ```
 
-To run the smoke test:
+To run the smoke tests:
 
 ```sh
 ctest --test-dir build --output-on-failure
 ```
 
-The current smoke test runs `td` non-interactively with a small input file and
-checks that the program completes without reporting a Topdrawer or UGS error.
+The current smoke test suite runs `td` non-interactively across a small set of
+curated inputs and checks that each case completes without reporting a
+Topdrawer or UGS error. The suite currently covers basic 2D plotting,
+multi-plot input, mesh/scatter paths, 3D plotting paths, and font-oriented
+rendering paths.
 
 ---
 
@@ -182,7 +185,7 @@ The workflow:
 - Clones and installs `f2c` and `ugs` into a temporary prefix.
 - Configures this repository with `-DNET_FETCH=ON` and `-DBUILD_TESTING=ON`.
 - Builds `td` with Ninja.
-- Runs the `CTest` smoke test.
+- Runs the `CTest` smoke test suite.
 
 The CI workflow is defined in:
 

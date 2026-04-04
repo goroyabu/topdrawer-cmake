@@ -29,3 +29,33 @@ add_td_smoke_case(
   INPUT_FILE "${TD_TEST_CASES_DIR}/01_smoke/input.top"
   EXPECTED_FILE "${TD_TEST_CASES_DIR}/01_smoke/expected.txt"
 )
+
+add_td_smoke_case(
+  02_muon
+  INPUT_FILE "${TD_TEST_CASES_DIR}/02_muon/input.top"
+  EXPECTED_FILE "${TD_TEST_CASES_DIR}/02_muon/expected.txt"
+)
+
+add_td_smoke_case(
+  03_two
+  INPUT_FILE "${TD_TEST_CASES_DIR}/03_two/input.top"
+  EXPECTED_FILE "${TD_TEST_CASES_DIR}/03_two/expected.txt"
+)
+
+add_td_smoke_case(
+  04_scatter
+  INPUT_FILE "${TD_TEST_CASES_DIR}/04_scatter/input.top"
+  EXPECTED_FILE "${TD_TEST_CASES_DIR}/04_scatter/expected.txt"
+)
+
+add_td_smoke_case(
+  05_3dim
+  INPUT_FILE "${TD_TEST_CASES_DIR}/05_3dim/input.top"
+  EXPECTED_FILE "${TD_TEST_CASES_DIR}/05_3dim/expected.txt"
+)
+
+add_td_smoke_case(
+  06_fonts
+  INPUT_FILE "${TD_TEST_CASES_DIR}/06_fonts/input.top"
+  EXPECTED_FILE "${TD_TEST_CASES_DIR}/06_fonts/expected.txt"
+)
