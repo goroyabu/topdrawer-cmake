@@ -163,7 +163,7 @@ add_download_cleanup_target(clean_downloads)
 # ---------------------------------------------------------------------------
 # Test
 # ---------------------------------------------------------------------------
-# include(CTest)
-# if(BUILD_TESTING AND EXISTS "${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt")
-#     add_subdirectory(tests)
-# endif()
+include(CTest)
+if(BUILD_TESTING AND EXISTS "${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt")
+    add_subdirectory(tests)
+endif()
