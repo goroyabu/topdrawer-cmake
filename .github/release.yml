@@ -1,0 +1,20 @@
+changelog:
+  categories:
+    - title: Build
+      labels:
+        - build
+    - title: CI
+      labels:
+        - ci
+    - title: Tests
+      labels:
+        - tests
+    - title: Documentation
+      labels:
+        - docs
+    - title: Release
+      labels:
+        - release
+    - title: Other Changes
+      labels:
+        - "*"

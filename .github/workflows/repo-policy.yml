@@ -1,0 +1,26 @@
+name: Repo Policy
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  semver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify project version uses full semver
+        run: |
+          grep -Eq 'project\\([^)]*VERSION [0-9]+\\.[0-9]+\\.[0-9]+' CMakeLists.txt
+
+  metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify GitHub metadata files exist
+        run: |
+          test -f .github/pull_request_template.md
+          test -f .github/release.yml
