@@ -165,6 +165,11 @@ add_td_postscript_case(
 )
 
 add_td_postscript_case(
+  io_errorbar_reordered_data
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/errorbar_reordered_data.top"
+)
+
+add_td_postscript_case(
   ps_structure_basic_plot
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
   CHECK_STRUCTURE
@@ -195,6 +200,12 @@ add_td_postscript_case(
   CHECK_STRUCTURE
 )
 
+add_td_postscript_case(
+  ps_structure_errorbar_reordered_data
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/errorbar_reordered_data.top"
+  CHECK_STRUCTURE
+)
+
 add_td_postscript_compare_case(
   command_output_plot_vs_join_differs
   LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
@@ -205,4 +216,10 @@ add_td_postscript_compare_case(
   command_output_histogram_differs_from_plot
   LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/histogram_basic.top"
   RIGHT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
+)
+
+add_td_postscript_compare_case(
+  command_output_errorbar_differs_from_no_errors
+  LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/errorbar_reordered_data.top"
+  RIGHT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/errorbar_no_errors.top"
 )
