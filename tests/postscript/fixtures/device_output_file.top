@@ -1,4 +1,4 @@
-SET DEVICE POSTSCRIPT FILE='explicit-device.ps'
+SET DEVICE POSTSCR FILE='explicit-device.ps'
 TITLE TOP "explicit device file"
 SET ORDER X Y
 0 1

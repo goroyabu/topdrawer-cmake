@@ -18,12 +18,16 @@ file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}")
 
 set(work_input "${WORK_DIR}/input.top")
+set(output_path "${WORK_DIR}/${OUTPUT_FILE}")
 file(COPY_FILE "${INPUT_FILE}" "${work_input}")
 
 if(USE_SCRIPT_DEVICE)
   set(td_command "${TD_EXECUTABLE}" "${work_input}")
 else()
-  set(td_command "${TD_EXECUTABLE}" "-d" "postscr" "${work_input}")
+  set(td_command
+    "${CMAKE_COMMAND}" -E env "TOPDRAWER_OUTPUT=${OUTPUT_FILE}"
+    "${TD_EXECUTABLE}" "-d" "postscr" "${work_input}"
+  )
 endif()
 
 execute_process(
@@ -50,18 +54,6 @@ if(td_output MATCHES "\\*\\*\\* ERROR \\*\\*\\*" OR td_output MATCHES "ERROR FOU
     "${TEST_NAME} reported an execution error\n"
     "stdout:\n${td_stdout}\n"
     "stderr:\n${td_stderr}\n")
-endif()
-
-set(output_path "${WORK_DIR}/${OUTPUT_FILE}")
-if(NOT EXISTS "${output_path}" AND NOT USE_SCRIPT_DEVICE)
-  get_filename_component(work_input_name "${work_input}" NAME)
-  get_filename_component(work_input_stem "${work_input}" NAME_WE)
-  foreach(candidate IN ITEMS "${work_input_stem}.ps" "${work_input_name}.ps")
-    if(EXISTS "${WORK_DIR}/${candidate}")
-      set(output_path "${WORK_DIR}/${candidate}")
-      break()
-    endif()
-  endforeach()
 endif()
 
 if(NOT EXISTS "${output_path}")

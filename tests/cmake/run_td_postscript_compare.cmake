@@ -9,13 +9,19 @@ endforeach()
 file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}")
 
-function(run_render input_file work_input_name output_file stdout_var stderr_var)
-  set(work_input "${WORK_DIR}/${work_input_name}")
+function(run_render input_file render_name output_file stdout_var stderr_var)
+  set(render_dir "${WORK_DIR}/${render_name}")
+  file(MAKE_DIRECTORY "${render_dir}")
+
+  set(work_input "${render_dir}/input.top")
+  set(output_path "${WORK_DIR}/${output_file}")
   file(COPY_FILE "${input_file}" "${work_input}")
 
   execute_process(
-    COMMAND "${TD_EXECUTABLE}" "-d" "postscr" "${work_input}"
-    WORKING_DIRECTORY "${WORK_DIR}"
+    COMMAND
+      "${CMAKE_COMMAND}" -E env "TOPDRAWER_OUTPUT=../${output_file}"
+      "${TD_EXECUTABLE}" "-d" "postscr" "${work_input}"
+    WORKING_DIRECTORY "${render_dir}"
     RESULT_VARIABLE td_result
     OUTPUT_VARIABLE td_stdout
     ERROR_VARIABLE td_stderr
@@ -39,20 +45,8 @@ function(run_render input_file work_input_name output_file stdout_var stderr_var
       "stderr:\n${td_stderr}\n")
   endif()
 
-  set(output_path "${WORK_DIR}/${output_file}")
   if(NOT EXISTS "${output_path}")
-    get_filename_component(work_input_stem "${work_input}" NAME_WE)
-    get_filename_component(work_input_name "${work_input}" NAME)
-    foreach(candidate IN ITEMS "${work_input_stem}.ps" "${work_input_name}.ps")
-      if(EXISTS "${WORK_DIR}/${candidate}")
-        set(output_path "${WORK_DIR}/${candidate}")
-        break()
-      endif()
-    endforeach()
-  endif()
-
-  if(NOT EXISTS "${output_path}")
-    file(GLOB work_dir_entries LIST_DIRECTORIES true "${WORK_DIR}/*")
+    file(GLOB work_dir_entries LIST_DIRECTORIES true "${render_dir}/*")
     string(REPLACE ";" "\n  " work_dir_entries_text "${work_dir_entries}")
     message(FATAL_ERROR
       "${TEST_NAME} did not create expected file '${output_path}'\n"
@@ -64,14 +58,12 @@ function(run_render input_file work_input_name output_file stdout_var stderr_var
     message(FATAL_ERROR "${TEST_NAME} created empty file '${output_path}'")
   endif()
 
-  file(COPY_FILE "${output_path}" "${WORK_DIR}/${output_file}" ONLY_IF_DIFFERENT)
-
   set(${stdout_var} "${td_stdout}" PARENT_SCOPE)
   set(${stderr_var} "${td_stderr}" PARENT_SCOPE)
 endfunction()
 
-run_render("${LEFT_INPUT}" "left.top" "left.ps" left_stdout left_stderr)
-run_render("${RIGHT_INPUT}" "right.top" "right.ps" right_stdout right_stderr)
+run_render("${LEFT_INPUT}" "left" "left.ps" left_stdout left_stderr)
+run_render("${RIGHT_INPUT}" "right" "right.ps" right_stdout right_stderr)
 
 file(SHA256 "${WORK_DIR}/left.ps" left_sha)
 file(SHA256 "${WORK_DIR}/right.ps" right_sha)
