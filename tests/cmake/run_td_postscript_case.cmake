@@ -53,9 +53,23 @@ if(td_output MATCHES "\\*\\*\\* ERROR \\*\\*\\*" OR td_output MATCHES "ERROR FOU
 endif()
 
 set(output_path "${WORK_DIR}/${OUTPUT_FILE}")
+if(NOT EXISTS "${output_path}" AND NOT USE_SCRIPT_DEVICE)
+  get_filename_component(work_input_name "${work_input}" NAME)
+  get_filename_component(work_input_stem "${work_input}" NAME_WE)
+  foreach(candidate IN ITEMS "${work_input_stem}.ps" "${work_input_name}.ps")
+    if(EXISTS "${WORK_DIR}/${candidate}")
+      set(output_path "${WORK_DIR}/${candidate}")
+      break()
+    endif()
+  endforeach()
+endif()
+
 if(NOT EXISTS "${output_path}")
+  file(GLOB work_dir_entries LIST_DIRECTORIES true "${WORK_DIR}/*")
+  string(REPLACE ";" "\n  " work_dir_entries_text "${work_dir_entries}")
   message(FATAL_ERROR
     "${TEST_NAME} did not create expected PostScript file '${output_path}'\n"
+    "work directory entries:\n  ${work_dir_entries_text}\n"
     "stdout:\n${td_stdout}\n"
     "stderr:\n${td_stderr}\n")
 endif()
