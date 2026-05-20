@@ -170,6 +170,11 @@ add_td_postscript_case(
 )
 
 add_td_postscript_case(
+  io_window_mixed_panels
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/window_mixed_panels.top"
+)
+
+add_td_postscript_case(
   ps_structure_basic_plot
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
   CHECK_STRUCTURE
@@ -206,6 +211,12 @@ add_td_postscript_case(
   CHECK_STRUCTURE
 )
 
+add_td_postscript_case(
+  ps_structure_window_mixed_panels
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/window_mixed_panels.top"
+  CHECK_STRUCTURE
+)
+
 add_td_postscript_compare_case(
   command_output_plot_vs_join_differs
   LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
@@ -222,4 +233,10 @@ add_td_postscript_compare_case(
   command_output_errorbar_differs_from_no_errors
   LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/errorbar_reordered_data.top"
   RIGHT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/errorbar_no_errors.top"
+)
+
+add_td_postscript_compare_case(
+  command_output_window_mixed_panels_differs_from_basic_plot
+  LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/window_mixed_panels.top"
+  RIGHT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
 )
