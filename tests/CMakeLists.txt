@@ -28,7 +28,8 @@ endfunction()
 function(add_td_postscript_case case_name)
   set(options CHECK_STRUCTURE USE_SCRIPT_DEVICE)
   set(oneValueArgs INPUT_FILE OUTPUT_FILE)
-  cmake_parse_arguments(TD_POSTSCRIPT "${options}" "${oneValueArgs}" "" ${ARGN})
+  set(multiValueArgs EXTRA_INPUT_FILES)
+  cmake_parse_arguments(TD_POSTSCRIPT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   if(NOT TD_POSTSCRIPT_INPUT_FILE)
     message(FATAL_ERROR "add_td_postscript_case requires INPUT_FILE.")
@@ -40,6 +41,11 @@ function(add_td_postscript_case case_name)
     else()
       set(TD_POSTSCRIPT_OUTPUT_FILE "input.ps")
     endif()
+  endif()
+
+  set(_extra_input_files_arg "")
+  if(TD_POSTSCRIPT_EXTRA_INPUT_FILES)
+    list(JOIN TD_POSTSCRIPT_EXTRA_INPUT_FILES "|" _extra_input_files_arg)
   endif()
 
   set(_case_work_dir "${CMAKE_CURRENT_BINARY_DIR}/${case_name}")
@@ -54,6 +60,7 @@ function(add_td_postscript_case case_name)
       "-DWORK_DIR=${_case_work_dir}"
       "-DCHECK_STRUCTURE=$<BOOL:${TD_POSTSCRIPT_CHECK_STRUCTURE}>"
       "-DUSE_SCRIPT_DEVICE=$<BOOL:${TD_POSTSCRIPT_USE_SCRIPT_DEVICE}>"
+      "-DEXTRA_INPUT_FILES=${_extra_input_files_arg}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/run_td_postscript_case.cmake"
   )
 
@@ -147,6 +154,12 @@ add_td_postscript_case(
 )
 
 add_td_postscript_case(
+  io_external_input_order_dummy
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/external_input_order.top"
+  EXTRA_INPUT_FILES "${TD_POSTSCRIPT_FIXTURES_DIR}/external_input_order.dat"
+)
+
+add_td_postscript_case(
   ps_structure_basic_plot
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
   CHECK_STRUCTURE
@@ -161,6 +174,13 @@ add_td_postscript_case(
 add_td_postscript_case(
   ps_structure_histogram
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/histogram_basic.top"
+  CHECK_STRUCTURE
+)
+
+add_td_postscript_case(
+  ps_structure_external_input
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/external_input_order.top"
+  EXTRA_INPUT_FILES "${TD_POSTSCRIPT_FIXTURES_DIR}/external_input_order.dat"
   CHECK_STRUCTURE
 )
 

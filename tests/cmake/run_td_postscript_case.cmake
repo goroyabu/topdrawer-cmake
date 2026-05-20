@@ -14,12 +14,24 @@ if(NOT DEFINED USE_SCRIPT_DEVICE)
   set(USE_SCRIPT_DEVICE OFF)
 endif()
 
+if(NOT DEFINED EXTRA_INPUT_FILES)
+  set(EXTRA_INPUT_FILES "")
+endif()
+
 file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}")
 
 set(work_input "${WORK_DIR}/input.top")
 set(output_path "${WORK_DIR}/${OUTPUT_FILE}")
 file(COPY_FILE "${INPUT_FILE}" "${work_input}")
+
+if(NOT "${EXTRA_INPUT_FILES}" STREQUAL "")
+  string(REPLACE "|" ";" extra_input_files "${EXTRA_INPUT_FILES}")
+  foreach(extra_input_file IN LISTS extra_input_files)
+    get_filename_component(extra_input_name "${extra_input_file}" NAME)
+    file(COPY_FILE "${extra_input_file}" "${WORK_DIR}/${extra_input_name}")
+  endforeach()
+endif()
 
 if(USE_SCRIPT_DEVICE)
   set(td_command "${TD_EXECUTABLE}" "${work_input}")
