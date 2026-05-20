@@ -1,0 +1,8 @@
+SET DEVICE POSTSCRIPT FILE='explicit-device.ps'
+TITLE TOP "explicit device file"
+SET ORDER X Y
+0 1
+1 3
+2 2
+3 4
+PLOT

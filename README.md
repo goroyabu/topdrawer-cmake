@@ -168,11 +168,20 @@ To run the smoke tests:
 ctest --test-dir build --output-on-failure
 ```
 
-The current smoke test suite runs `td` non-interactively across a small set of
+The smoke test suite runs `td` non-interactively across a small set of
 repository-managed minimal inputs and checks that each case completes without
 reporting a Topdrawer or UGS error. The suite currently covers basic 2D
 plotting, error-bar and spline input, multi-plot input, mesh/scatter paths,
 3D plotting paths, and font-oriented rendering paths.
+
+The test suite also includes lightweight PostScript rendering and file I/O checks. These
+tests generate PostScript with the `postscr` device, check that expected output
+files are created and nonempty, inspect basic PostScript structure, and verify
+that selected drawing commands produce distinguishable output:
+
+```sh
+ctest --test-dir build -L postscript --output-on-failure
+```
 
 ---
 
