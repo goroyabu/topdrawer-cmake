@@ -1,5 +1,19 @@
 set(TD_TEST_CASES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cases")
 set(TD_POSTSCRIPT_FIXTURES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/postscript/fixtures")
+set(TD_POSTSCRIPT_TESTS_DISABLED FALSE)
+
+# See https://github.com/goroyabu/topdrawer-cmake/issues/27.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(TD_POSTSCRIPT_TESTS_DISABLED TRUE)
+endif()
+
+function(set_td_postscript_test_properties test_name labels)
+  set_tests_properties("${test_name}" PROPERTIES LABELS "${labels}")
+
+  if(TD_POSTSCRIPT_TESTS_DISABLED)
+    set_tests_properties("${test_name}" PROPERTIES DISABLED TRUE)
+  endif()
+endfunction()
 
 function(add_td_smoke_case case_name)
   set(options)
@@ -58,9 +72,9 @@ function(add_td_postscript_case case_name)
   )
 
   if(TD_POSTSCRIPT_CHECK_STRUCTURE)
-    set_tests_properties("${case_name}" PROPERTIES LABELS "postscript;ps_structure")
+    set_td_postscript_test_properties("${case_name}" "postscript;ps_structure")
   else()
-    set_tests_properties("${case_name}" PROPERTIES LABELS "postscript;io")
+    set_td_postscript_test_properties("${case_name}" "postscript;io")
   endif()
 endfunction()
 
@@ -85,7 +99,7 @@ function(add_td_postscript_compare_case case_name)
       "-DWORK_DIR=${_case_work_dir}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/run_td_postscript_compare.cmake"
   )
-  set_tests_properties("${case_name}" PROPERTIES LABELS "postscript;command_output")
+  set_td_postscript_test_properties("${case_name}" "postscript;command_output")
 endfunction()
 
 add_td_smoke_case(
