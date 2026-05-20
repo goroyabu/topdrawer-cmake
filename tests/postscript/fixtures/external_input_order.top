@@ -1,0 +1,5 @@
+TITLE TOP 'External input with SET ORDER and DUMMY'
+SET LIMITS X 0 4 Y 0 4
+SET ORDER X DUMMY Y DY
+SET FILE INPUT='external_input_order.dat'
+PLOT
