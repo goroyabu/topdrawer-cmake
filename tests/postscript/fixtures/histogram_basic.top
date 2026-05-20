@@ -1,0 +1,8 @@
+TITLE TOP "basic histogram"
+SET ORDER X Y
+SET LIMITS X 0 TO 5 Y 0 TO 8
+1 2
+2 5
+3 3
+4 6
+HISTOGRAM
