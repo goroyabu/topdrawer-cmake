@@ -160,6 +160,11 @@ add_td_postscript_case(
 )
 
 add_td_postscript_case(
+  io_title_coordinate_labels
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/title_coordinate_labels.top"
+)
+
+add_td_postscript_case(
   ps_structure_basic_plot
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
   CHECK_STRUCTURE
@@ -181,6 +186,12 @@ add_td_postscript_case(
   ps_structure_external_input
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/external_input_order.top"
   EXTRA_INPUT_FILES "${TD_POSTSCRIPT_FIXTURES_DIR}/external_input_order.dat"
+  CHECK_STRUCTURE
+)
+
+add_td_postscript_case(
+  ps_structure_title_coordinate_labels
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/title_coordinate_labels.top"
   CHECK_STRUCTURE
 )
 
