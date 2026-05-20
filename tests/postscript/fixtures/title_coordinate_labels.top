@@ -1,0 +1,9 @@
+TITLE TOP 'coordinate labels'
+SET LIMITS X 0 4 Y 0 4
+0.5 1.0
+1.5 2.4
+2.5 1.8
+3.5 3.1
+JOIN
+TITLE 1.0 3.5 DATA LJUSTIFY 'data frame label'
+TITLE 5.5 2.0 TEXT LJUSTIFY 'text frame label'
