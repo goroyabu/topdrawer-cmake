@@ -9,9 +9,12 @@ endforeach()
 file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}")
 
-function(run_render input_file output_file stdout_var stderr_var)
+function(run_render input_file work_input_name output_file stdout_var stderr_var)
+  set(work_input "${WORK_DIR}/${work_input_name}")
+  file(COPY_FILE "${input_file}" "${work_input}")
+
   execute_process(
-    COMMAND "${TD_EXECUTABLE}" "-d" "postscr,ddname=${output_file}" "${input_file}"
+    COMMAND "${TD_EXECUTABLE}" "-d" "postscr" "${work_input}"
     WORKING_DIRECTORY "${WORK_DIR}"
     RESULT_VARIABLE td_result
     OUTPUT_VARIABLE td_stdout
@@ -50,8 +53,8 @@ function(run_render input_file output_file stdout_var stderr_var)
   set(${stderr_var} "${td_stderr}" PARENT_SCOPE)
 endfunction()
 
-run_render("${LEFT_INPUT}" "left.ps" left_stdout left_stderr)
-run_render("${RIGHT_INPUT}" "right.ps" right_stdout right_stderr)
+run_render("${LEFT_INPUT}" "left.top" "left.ps" left_stdout left_stderr)
+run_render("${RIGHT_INPUT}" "right.top" "right.ps" right_stdout right_stderr)
 
 file(SHA256 "${WORK_DIR}/left.ps" left_sha)
 file(SHA256 "${WORK_DIR}/right.ps" right_sha)

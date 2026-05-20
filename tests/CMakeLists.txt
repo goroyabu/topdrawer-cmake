@@ -35,7 +35,11 @@ function(add_td_postscript_case case_name)
   endif()
 
   if(NOT TD_POSTSCRIPT_OUTPUT_FILE)
-    set(TD_POSTSCRIPT_OUTPUT_FILE "output.ps")
+    if(TD_POSTSCRIPT_USE_SCRIPT_DEVICE)
+      set(TD_POSTSCRIPT_OUTPUT_FILE "explicit-device.ps")
+    else()
+      set(TD_POSTSCRIPT_OUTPUT_FILE "input.ps")
+    endif()
   endif()
 
   set(_case_work_dir "${CMAKE_CURRENT_BINARY_DIR}/${case_name}")

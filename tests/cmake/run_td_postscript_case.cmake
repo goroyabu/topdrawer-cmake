@@ -17,10 +17,13 @@ endif()
 file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}")
 
+set(work_input "${WORK_DIR}/input.top")
+file(COPY_FILE "${INPUT_FILE}" "${work_input}")
+
 if(USE_SCRIPT_DEVICE)
-  set(td_command "${TD_EXECUTABLE}" "${INPUT_FILE}")
+  set(td_command "${TD_EXECUTABLE}" "${work_input}")
 else()
-  set(td_command "${TD_EXECUTABLE}" "-d" "postscr,ddname=${OUTPUT_FILE}" "${INPUT_FILE}")
+  set(td_command "${TD_EXECUTABLE}" "-d" "postscr" "${work_input}")
 endif()
 
 execute_process(

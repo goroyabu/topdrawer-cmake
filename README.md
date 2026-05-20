@@ -175,7 +175,7 @@ plotting, error-bar and spline input, multi-plot input, mesh/scatter paths,
 3D plotting paths, and font-oriented rendering paths.
 
 The test suite also includes lightweight PostScript rendering and file I/O checks. These
-tests generate PostScript with the `postscr` device, check that expected output
+tests generate PostScript with the `postscr` device, check that expected `.ps`
 files are created and nonempty, inspect basic PostScript structure, and verify
 that selected drawing commands produce distinguishable output:
 
