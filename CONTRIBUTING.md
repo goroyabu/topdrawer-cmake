@@ -93,6 +93,21 @@ ctest --test-dir build --output-on-failure
 
 Run `cmake --install build --prefix <prefix>` when install behavior changes.
 
+### Docker Probe
+
+Use the Docker probe for local CI-equivalent validation when changes affect CI
+bootstrap, external dependency discovery, CMake build logic, test registration
+or execution, packaging-sensitive behavior, or related documentation.
+
+The default probe configures, builds, and runs CTest inside an Ubuntu container:
+
+```sh
+docker compose -f tests/docker-probe/compose.yml run --rm ci
+```
+
+See `tests/docker-probe/README.md` for prerequisites, config validation, image
+build, debug shell usage, install-sensitive checks, and limitations.
+
 Prefer lightweight verification that can run non-interactively. When adding
 tests, prefer `CTest`-registered smoke coverage around the built `td` executable
 and avoid relying on interactive X11 behavior.
