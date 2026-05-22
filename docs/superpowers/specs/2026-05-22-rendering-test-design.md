@@ -126,7 +126,7 @@ Fixtures should:
 - avoid known unstable or unrelated behavior unless that behavior is the test
   target.
 
-Manual samples under `tests/manual-samples/` are reference material for
+Manual samples under local `refs/manual-samples/` are reference material for
 exploration and visual comparison. They are not wired into CTest or CI, and they
 should not become committed fixtures without an explicit review of origin,
 license, and test intent.
@@ -347,8 +347,8 @@ Suggested smoke fixture renames are:
   fixture policy.
 - Keep current smoke tests as a separate fast layer.
 - Keep the committed PostScript/I/O layer non-raster by default.
-- Treat `tests/manual-samples/` as exploratory reference material, not committed
-  fixture source material.
+- Treat local `refs/manual-samples/` as exploratory reference material, not
+  committed fixture source material.
 - Defer raster and golden-image checks until renderer dependency, baseline, and
   tolerance decisions are documented.
 - Treat font, symbol, `CASE`, and glyph-heavy visual checks as constrained by

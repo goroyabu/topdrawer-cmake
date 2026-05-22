@@ -157,6 +157,7 @@ Temporary Items
 /generated/
 /_dl/
 /xsum*.out
+/refs/
 
 # Ninja/CTest extras
 *.ninja
