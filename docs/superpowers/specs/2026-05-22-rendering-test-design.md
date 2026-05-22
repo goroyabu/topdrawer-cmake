@@ -224,6 +224,31 @@ Recommended deferred additions:
 
 Long-term coverage should remain representative rather than exhaustive.
 
+Fixture count estimates should be based on failure modes rather than manual
+sample counts. Broad demonstration samples should be split when they combine
+unrelated concerns such as axes, labels, arrows, grids, and error bars.
+
+Representative long-term feature categories are:
+
+| Feature category | Fixture count estimate | Suggested test levels | Test count estimate | Rationale |
+|---|---:|---|---:|---|
+| Basic plot / join | 2 | 1, 2, 3, 4, limited 5 | 8-10 | `PLOT` and `JOIN` are basic but exercise different drawing paths. |
+| Histogram | 1 | 1, 2, 3, 4, limited 5 | 4-5 | One minimal histogram fixture is enough for the first coverage pass. |
+| Error bars / data order | 2 | 1, 2, 3, 4 | 6-8 | Error bars and `SET ORDER` or column reordering have different failure modes. |
+| Symbols / styles | 2 | 1, 2, 3, 4 | 6-8 | Per-point symbols and line/style options should be separated. |
+| Titles / text coordinates | 2 | 1, 2, 3, 4, limited 5 | 7-9 | Standard titles and coordinate placement exercise different positioning behavior. |
+| CASE / fonts / glyphs | 3 | 1, 2, 4, limited 5 | 8-10 | Font selection, CASE positioning, and glyph tables can fail independently. |
+| Limits / scale / ticks / labels | 3 | 1, 2, 3, 4 | 9-12 | Axis range, tick setup, scale setup, and label placement are distinct behaviors. |
+| Windows / panels | 2 | 1, 2, 3, 4, limited 5 | 7-9 | Explicit windows and panel splitting exercise different layout behavior. |
+| Annotations / arrows / shield / grid | 2 | 1, 2, 3, 4 | 6-8 | Annotation drawing and clipping/grid behavior should be diagnosed separately. |
+| Function-generated data / expressions | 2 | 1, 2, 3, 4 | 6-8 | Range-generated data and expression expansion are separate parser/evaluator paths. |
+| Variables / string expansion | 2 | 1, 2, 3 | 5-6 | Numeric variables and string substitution should not share one broad fixture. |
+| Polar plotting | 1 | 1, 2, 4, limited 5 | 3-4 | One representative `SET POLAR` fixture is enough before variants. |
+| Log scale | 1 | 1, 2, 3, 4 | 3-4 | One representative log-scale fixture should cover the initial path. |
+| External input / include / dummy columns | 2 | 1, 2, 3 | 5-6 | External file loading and `DUMMY`/column selection deserve separate fixtures. |
+| Device output / file naming / orientation | 2 | 1, 2 | 4 | Output naming and device/orientation options are separate I/O contracts. |
+| Mesh / contour / 3D/random | 3 | 1, 2, 3, 4 | 9-12 | Mesh input, contour, and 3D/random plotting use separate rendering paths. |
+
 Useful planning bands are:
 
 | Coverage scope | Fixture count | Test count estimate | Intended use |
@@ -237,6 +262,18 @@ For this repository, the preferred long-term target is standard coverage in
 practice, with only a small number of golden-image tests. The repository's
 purpose remains build, install, portability, and verification of legacy
 Topdrawer, not full language-level conformance.
+
+Fixture count decisions should follow these rules:
+
+- Prefer one primary failure mode per fixture.
+- Split broad demonstration inputs into smaller fixtures when they mix unrelated
+  behavior.
+- Keep fixtures small enough that failures are easy to inspect.
+- Reuse fixtures across multiple test levels instead of duplicating input data.
+- Add fixture variants only when they exercise a distinct parser, evaluator,
+  device, layout, or rendering path.
+- Keep rare or expensive checks, especially raster and golden-image checks, to a
+  representative subset.
 
 ## Risks and Tradeoffs
 
@@ -253,6 +290,54 @@ Topdrawer, not full language-level conformance.
 
 The preferred balance is to keep fixtures small, reuse them across test levels,
 and reserve expensive or brittle checks for representative cases.
+
+## Future Layout Cleanup
+
+The existing smoke inputs live under `tests/cases/`. That name is generic, while
+the current contents are really smoke fixtures. A future cleanup may rename this
+area to `tests/smoke/`, but that should be a separate commit from coverage
+additions because it changes tracked paths without adding test behavior.
+
+A possible future layout is:
+
+```text
+tests/
+  CMakeLists.txt
+  cmake/
+    run_td_smoke_case.cmake
+    run_td_postscript_case.cmake
+    run_td_postscript_compare.cmake
+  smoke/
+    01_basic_plot/
+    02_errorbar_spline/
+    03_multi_plot/
+    04_mesh_random/
+    05_mesh_contour_histogram/
+    06_text_fonts/
+  postscript/
+    fixtures/
+```
+
+Suggested smoke fixture renames are:
+
+| Current path | Suggested path | Reason |
+|---|---|---|
+| `tests/cases/01_smoke` | `tests/smoke/01_basic_plot` | Minimal 2D point plot. |
+| `tests/cases/02_muon` | `tests/smoke/02_errorbar_spline` | Exercises `X Y DY`, `PLOT`, and spline joins. |
+| `tests/cases/03_two` | `tests/smoke/03_multi_plot` | Exercises `NEW PLOT` and multiple plotted datasets. |
+| `tests/cases/04_scatter` | `tests/smoke/04_mesh_random` | Exercises `READ MESH` and `PLOT RANDOM`. |
+| `tests/cases/05_3dim` | `tests/smoke/05_mesh_contour_histogram` | Combines mesh, histogram, contour, and random plot paths. |
+| `tests/cases/06_fonts` | `tests/smoke/06_text_fonts` | Exercises fonts, titles, CASE, and symbol text behavior. |
+
+## Open Questions
+
+- Which PostScript structural markers remain stable across supported platforms
+  and UGS/PostScript backend versions?
+- Should future command-sensitive tests compare raw PostScript bytes,
+  normalized PostScript text, file size ranges, or selected structural features?
+- Which image renderer, if any, should be required for Level 4 tests in CI?
+- Should Level 4 and Level 5 tests stay opt-in until the rendering dependency
+  path is documented?
 
 ## Accepted Decisions
 
