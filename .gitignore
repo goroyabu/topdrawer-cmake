@@ -157,6 +157,7 @@ Temporary Items
 /generated/
 /_dl/
 /xsum*.out
+/refs/
 
 # Ninja/CTest extras
 *.ninja
@@ -165,7 +166,7 @@ Temporary Items
 Testing/
 CTestTestfile.cmake
 
-# macOS extras (保険)
+# macOS extras
 .DS_Store
 # Do not publish upstream snapshots
 third_party/f2c/**
@@ -173,5 +174,3 @@ third_party/f2c/**
 
 # If you keep tarballs locally, do not publish them either
 third_party/tarballs/
-
-AGENTS.md

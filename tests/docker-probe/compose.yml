@@ -1,0 +1,18 @@
+services:
+  ci:
+    build:
+      context: ../..
+      dockerfile: tests/docker-probe/ubuntu-ci.Dockerfile
+    image: td-ubuntu-ci-probe-amd64
+    platform: linux/amd64
+    volumes:
+      - ../..:/work
+
+  shell:
+    image: td-ubuntu-ci-probe-amd64
+    platform: linux/amd64
+    volumes:
+      - ../..:/work
+    entrypoint: ["/bin/bash"]
+    command: ["-l"]
+    profiles: ["debug"]
