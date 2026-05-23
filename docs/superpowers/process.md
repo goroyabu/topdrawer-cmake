@@ -94,3 +94,15 @@ residual risk.
 
 The PR is the final integration record. It should be understandable without
 requiring a reader to reconstruct the development process from chat history.
+
+### 8. Integration and branch cleanup follow repository settings
+
+The repository protects `main` and expects normal changes to be integrated by
+pull request. Agents should not push directly to `main`.
+
+After a pull request is merged, GitHub deletes the merged head branch
+automatically. The local follow-up is to update `main`, prune stale remote
+references, and remove any merged local topic branch.
+
+If remote branches remain after a merge, verify that each branch is merged into
+`origin/main` before deleting it.

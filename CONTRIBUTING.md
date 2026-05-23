@@ -60,10 +60,12 @@ repurposed.
 
 ## Development Workflow
 
-- Do not commit directly to `main` for normal development work.
+- Do not commit or push directly to `main` for normal development work.
 - Start work from a topic branch created from `main`.
 - Merge changes into `main` through a pull request.
-- Prefer deleting merged topic branches once they are no longer needed.
+- The repository protects `main` so normal changes must go through pull
+  requests.
+- GitHub is configured to delete merged head branches automatically.
 - Keep pull requests focused on one coherent maintenance change.
 - Use PR titles and labels that will remain useful in release notes.
 - When `.github/` metadata exists, keep workflow names, labels, and release-note
