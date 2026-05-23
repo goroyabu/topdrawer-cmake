@@ -18,6 +18,10 @@ and delegate durable policy to tracked project documentation.
   metadata.
 - Use the superpowers workflow when work needs traceability across design,
   implementation planning, verification, and review.
+- Before creating commits, pushing branches or tags, creating or updating pull
+  requests, or creating/updating/commenting on GitHub issues, stop and explain
+  the target, proposed content or command, reason, expected effect, and notable
+  risks. Proceed only after explicit user approval for that specific action.
 - Do not commit unpacked or patched upstream source trees.
 - Do not edit generated or unpacked files under `build/vendor`; move required
   fixes into the reproducible patching step.

@@ -175,6 +175,11 @@ add_td_postscript_case(
 )
 
 add_td_postscript_case(
+  io_axis_titles_outline
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/axis_titles_outline.top"
+)
+
+add_td_postscript_case(
   ps_structure_basic_plot
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
   CHECK_STRUCTURE
@@ -214,6 +219,12 @@ add_td_postscript_case(
 add_td_postscript_case(
   ps_structure_window_mixed_panels
   INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/window_mixed_panels.top"
+  CHECK_STRUCTURE
+)
+
+add_td_postscript_case(
+  ps_structure_axis_titles_outline
+  INPUT_FILE "${TD_POSTSCRIPT_FIXTURES_DIR}/axis_titles_outline.top"
   CHECK_STRUCTURE
 )
 
