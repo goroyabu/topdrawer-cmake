@@ -78,13 +78,13 @@ The tracked test suite currently contains:
 | Group | Count | Notes |
 |---|---:|---|
 | Smoke tests | 6 | Process success and expected text checks for existing minimal inputs. |
-| Level 1: I/O contract | 7 | Basic plot, join, histogram, explicit device output, external input, coordinate titles, and error-bar/data-order fixtures. |
-| Level 2: PostScript structural | 6 | Structure checks for basic plot, join, histogram, external input, coordinate titles, and error-bar/data-order fixtures. |
-| Level 3: Command-sensitive output | 3 | Plot vs join, histogram vs plot, and error-bar vs no-error-bar comparisons. |
+| Level 1: I/O contract | 9 | Basic plot, join, histogram, explicit device output, external input, coordinate titles, error-bar/data-order, window/panel, and axis title/outline fixtures. |
+| Level 2: PostScript structural | 8 | Structure checks for basic plot, join, histogram, external input, coordinate titles, error-bar/data-order, window/panel, and axis title/outline fixtures. |
+| Level 3: Command-sensitive output | 4 | Plot vs join, histogram vs plot, error-bar vs no-error-bar, and window/panel vs basic plot comparisons. |
 | Level 4: Raster render probe | 0 | Deferred until renderer dependency handling is decided. |
 | Level 5: Golden image | 0 | Deferred until baseline and tolerance policy is decided. |
 
-The current total is 22 CTest cases: 6 smoke tests and 16 PostScript/I/O-oriented
+The current total is 27 CTest cases: 6 smoke tests and 21 PostScript/I/O-oriented
 tests.
 
 ## Test Levels
@@ -142,6 +142,8 @@ The current PostScript fixture set covers:
 - external input with `SET ORDER` and `DUMMY` columns;
 - title placement with data and text coordinates;
 - error-bar and reordered data behavior;
+- mixed window/panel layout behavior;
+- axis title and explicit axis outline command acceptance;
 - command-sensitive output differences for selected comparable fixtures.
 
 The existing smoke fixtures continue to cover broader process-success paths,
@@ -155,10 +157,10 @@ Issue #25 is the primary planning hub. It should stay open while follow-up
 coverage remains active. Its role is to track status, related issues, and next
 work items. Detailed design rationale should live in this spec.
 
-The next implementation candidate from issue #25 is axis-related PostScript
-coverage, starting with small fixtures such as:
+The completed axis title/outline slice is covered by `axis_titles_outline.top`.
+The next implementation candidate from issue #25 is axis decoration coverage,
+starting with a small fixture such as:
 
-- `axis_titles.top`;
 - `axis_ticks_grid.top`.
 
 Those should receive a separate implementation plan before file changes are
@@ -207,9 +209,8 @@ manual examples into the repository.
 
 Recommended near-term additions:
 
-- axis titles and labels;
-- ticks and grid behavior;
-- window or panel layout;
+- axis decoration such as ticks, labels, scale settings, and grids;
+- additional window or panel layout variants;
 - additional command-sensitive comparisons where they remain diagnostic.
 
 Recommended deferred additions:
@@ -219,6 +220,40 @@ Recommended deferred additions:
 - golden-image checks until baseline generation, tolerance, and update policy
   are stable;
 - test layout cleanup such as renaming `tests/cases/` to `tests/smoke/`.
+
+## Axis Sample Coverage Requirements
+
+Axis coverage should be derived from the local manual sample references, not
+from fixture names chosen in advance. The reference samples show several
+axis-related command groups that should become small independently authored
+fixtures over time.
+
+Existing tracked tests already cover:
+
+- `TITLE TOP` as a common title command;
+- basic `SET LIMITS X ... Y ...` usage;
+- `SET WINDOW` usage in smoke tests and the mixed window/panel PostScript
+  fixture;
+- data/text coordinate titles through `title_coordinate_labels.top`.
+
+The sample-derived axis coverage is split into two near-term groups:
+
+| Group | Sample-derived commands | Reference samples | Coverage intent |
+|---|---|---|---|
+| Axis title / outline | `PLOT AXIS`, `TITLE BOTTOM`, `TITLE LEFT`, `TITLE RIGHT`, plus simple limits/window setup | `topdrawer-sample/08`, `topdrawer-sample/13`, `topdrawer-sample/17`, `topdrawer-sample/18` | Verify that explicit axis drawing and side-specific axis titles are accepted on the non-interactive PostScript path. |
+| Axis decoration | `SET LABELS`, `SET TICKS`, `SET SCALE ... TICKS/LABELS`, `SET GRID`, `SET GRID SYMBOL`, `SET GRID OFF`, plus `PLOT AXIS` | `topdrawer-sample/09`, `topdrawer-sample/10`, `topdrawer-sample/12` | Verify that tick, label, scale, and grid decoration commands are accepted on the non-interactive PostScript path. |
+
+The first implemented axis slice covers only the axis title / outline group so
+the fixture remains diagnostic. It is covered by `axis_titles_outline.top`.
+The axis decoration group remains the next axis-related follow-up.
+
+Do not include the following in the first axis slice:
+
+- `SET POLAR` and polar `PLOT AXIS` cases from `topdrawer-sample/15`;
+- `CASE`, `SET FONT DUPLEX`, symbolic titles, and glyph-heavy title strings
+  related to issue #24;
+- log-scale behavior from `topdrawer-sample/17`;
+- raster, image conversion, or golden-image assertions.
 
 ## Full Coverage Planning Bands
 
