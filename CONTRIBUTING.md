@@ -62,6 +62,11 @@ repurposed.
 
 - Do not commit or push directly to `main` for normal development work.
 - Start work from a topic branch created from `main`.
+- Name topic branches as `<type>/<short-kebab-summary>`.
+- Use stable branch types that match the repository's maintenance categories,
+  such as `build`, `docs`, `tests`, `ci`, `release`, or `meta`.
+- When an issue number is useful context, include it after the type rather than
+  replacing the type, for example `tests/issue-25-axis-postscript-fixture`.
 - Merge changes into `main` through a pull request.
 - The repository protects `main` so normal changes must go through pull
   requests.
