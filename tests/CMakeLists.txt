@@ -251,3 +251,9 @@ add_td_postscript_compare_case(
   LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/window_mixed_panels.top"
   RIGHT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
 )
+
+add_td_postscript_compare_case(
+  command_output_duplex_glyph_a_differs_from_two
+  LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/duplex_glyph_a.top"
+  RIGHT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/duplex_glyph_two.top"
+)

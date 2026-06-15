@@ -8,8 +8,8 @@ PostScript file output, and future rendering checks.
 The existing smoke tests remain the fast "does it run" layer. The committed
 PostScript/I/O tests add deterministic file-output checks, basic PostScript
 structure checks, and small command-sensitive output comparisons. Future raster
-and golden-image tests should be added only after renderer dependency handling,
-baseline policy, and known glyph-rendering risks are understood.
+and golden-image tests should be added only after renderer dependency handling
+and baseline policy are documented.
 
 GitHub issue #25 remains the work-tracking hub for expanded PostScript and
 rendering coverage. This spec is the versioned design record for the test
@@ -80,11 +80,11 @@ The tracked test suite currently contains:
 | Smoke tests | 6 | Process success and expected text checks for existing minimal inputs. |
 | Level 1: I/O contract | 9 | Basic plot, join, histogram, explicit device output, external input, coordinate titles, error-bar/data-order, window/panel, and axis title/outline fixtures. |
 | Level 2: PostScript structural | 8 | Structure checks for basic plot, join, histogram, external input, coordinate titles, error-bar/data-order, window/panel, and axis title/outline fixtures. |
-| Level 3: Command-sensitive output | 4 | Plot vs join, histogram vs plot, error-bar vs no-error-bar, and window/panel vs basic plot comparisons. |
+| Level 3: Command-sensitive output | 5 | Plot vs join, histogram vs plot, error-bar vs no-error-bar, window/panel vs basic plot, and DUPLEX glyph A vs 2 comparisons. |
 | Level 4: Raster render probe | 0 | Deferred until renderer dependency handling is decided. |
 | Level 5: Golden image | 0 | Deferred until baseline and tolerance policy is decided. |
 
-The current total is 27 CTest cases: 6 smoke tests and 21 PostScript/I/O-oriented
+The current total is 28 CTest cases: 6 smoke tests and 22 PostScript/I/O-oriented
 tests.
 
 ## Test Levels
@@ -144,6 +144,7 @@ The current PostScript fixture set covers:
 - error-bar and reordered data behavior;
 - mixed window/panel layout behavior;
 - axis title and explicit axis outline command acceptance;
+- DUPLEX font glyph differentiation for a resolved little-endian lookup regression;
 - command-sensitive output differences for selected comparable fixtures.
 
 The existing smoke fixtures continue to cover broader process-success paths,
@@ -166,15 +167,18 @@ starting with a small fixture such as:
 Those should receive a separate implementation plan before file changes are
 made.
 
-### Issue #24: Font and Symbol Glyph Rendering Bug
+### Issue #24: Closed Font and Symbol Glyph Regression
 
-Issue #24 is a bug report for glyphs rendering as horizontal bars in PostScript
-output. It should remain a bug issue, not a test-planning document.
+Issue #24 recorded a glyph regression where DUPLEX text and symbol output
+collapsed to repeated horizontal-bar-like strokes on macOS GNU Fortran builds.
 
-This spec treats font, symbol, `CASE`, and glyph-heavy visual checks as
-constrained by that bug. Future fixtures may exercise those paths as smoke or
-I/O checks, but visual correctness assertions should wait until the underlying
-UGS or glyph-rendering behavior is understood.
+That issue is now historical context. The underlying UGS little-endian lookup
+fix landed upstream, the local reproduction no longer shows the bug, and this
+repository now carries a command-sensitive regression check that verifies
+distinct PostScript output for DUPLEX `A` versus `2`.
+
+Future font, symbol, and `CASE` fixtures may still be added incrementally, but
+they are no longer blocked on issue #24.
 
 ### Issue #27: Linux PostScript Filename Override Investigation
 
@@ -215,7 +219,8 @@ Recommended near-term additions:
 
 Recommended deferred additions:
 
-- symbol, font, and glyph visual assertions until issue #24 is understood;
+- wider symbol, font, and glyph visual assertions until renderer-dependent
+  visual checks are intentionally added;
 - raster nonblank probes until renderer dependency handling is documented;
 - golden-image checks until baseline generation, tolerance, and update policy
   are stable;
@@ -250,8 +255,8 @@ The axis decoration group remains the next axis-related follow-up.
 Do not include the following in the first axis slice:
 
 - `SET POLAR` and polar `PLOT AXIS` cases from `topdrawer-sample/15`;
-- `CASE`, `SET FONT DUPLEX`, symbolic titles, and glyph-heavy title strings
-  related to issue #24;
+- `CASE`, `SET FONT DUPLEX`, symbolic titles, and glyph-heavy title strings,
+  which belong to separate font-focused fixtures;
 - log-scale behavior from `topdrawer-sample/17`;
 - raster, image conversion, or golden-image assertions.
 
@@ -386,5 +391,5 @@ Suggested smoke fixture renames are:
   committed fixture source material.
 - Defer raster and golden-image checks until renderer dependency, baseline, and
   tolerance decisions are documented.
-- Treat font, symbol, `CASE`, and glyph-heavy visual checks as constrained by
-  issue #24 until the rendering bug is understood.
+- Treat font, symbol, `CASE`, and glyph-heavy coverage as follow-up fixture
+  work, not as a blocker on the current PostScript/I/O layer.

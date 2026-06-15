@@ -1,0 +1,4 @@
+SET FONT DUPLEX
+SET TITLE SIZE 2
+TITLE TOP 'duplex glyph compare'
+TITLE 2 8 'A'
