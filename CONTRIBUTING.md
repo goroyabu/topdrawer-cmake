@@ -111,6 +111,19 @@ ctest --test-dir build --output-on-failure
 
 Run `cmake --install build --prefix <prefix>` when install behavior changes.
 
+Use CMake and CTest 3.21 or newer throughout the workflow. CI retains the
+default Ubuntu build and adds a minimum-version entry on Ubuntu 24.04 with
+CMake/CTest 3.21.7. The minimum entry verifies the official tool archive's
+SHA256, prints and checks both tool versions, runs configure/build/all CTest
+cases, and installs into a temporary prefix.
+
+External dependencies are built with the runner's CMake before selecting the
+minimum version for `td`; their own source-build requirements are separate from
+the requirements for consuming their installed packages. The minimum entry
+checks installation execution, not installed runtime behavior or uninstall.
+When changing CMake commands or options, preserve compatibility with 3.21 and
+verify the affected paths with the minimum tool as well as the normal build.
+
 ### Docker Probe
 
 Use the Docker probe for local CI-equivalent validation when changes affect CI

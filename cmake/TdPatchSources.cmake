@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 
 if(NOT DEFINED TOPDRAWER_ROOT)
     message(FATAL_ERROR "TOPDRAWER_ROOT is not defined")

@@ -12,7 +12,8 @@ modifying the upstream sources in place.
 
 ## Requirements
 
-- CMake **3.15** or newer.
+- CMake and CTest **3.21** or newer for configuring, building, testing, and
+  installing this project.
 - A C compiler (Clang, GCC, …).
 - A Fortran compiler (e.g. `gfortran`).
 - An installed **f2c** package that provides a CMake config file and the runtime
