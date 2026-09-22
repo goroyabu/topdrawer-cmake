@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.21)
 
 foreach(req_var IN ITEMS TEST_NAME TD_EXECUTABLE INPUT_FILE WORK_DIR OUTPUT_FILE)
   if(NOT DEFINED ${req_var} OR "${${req_var}}" STREQUAL "")

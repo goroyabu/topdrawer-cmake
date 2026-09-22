@@ -83,6 +83,17 @@ repurposed.
 Use `docs/superpowers/process.md` when a change needs traceability across design,
 implementation planning, verification, and review.
 
+Do not add new superpowers specifications, implementation plans, or temporary
+planning records to Git. Keep these as ignored local notes, or record decisions,
+plans, and verification in the relevant Issue or PR after the required approval
+for that external write. Incorporate durable changes to the current project
+contract into README, CONTRIBUTING, or other canonical documentation.
+
+The `docs/superpowers/specs/` and `docs/superpowers/plans/` directories are
+ignored for new files. Existing tracked records remain historical references;
+their removal or migration is separate work. This policy takes precedence over
+skill instructions to create or commit versioned planning artifacts.
+
 The full superpowers workflow is not required for every change. Use it for work
 with lasting design or execution value, such as changes to build logic,
 dependency discovery, archive handling, source patching, CI, packaging, test
@@ -99,6 +110,19 @@ ctest --test-dir build --output-on-failure
 ```
 
 Run `cmake --install build --prefix <prefix>` when install behavior changes.
+
+Use CMake and CTest 3.21 or newer throughout the workflow. CI retains the
+default Ubuntu build and adds a minimum-version entry on Ubuntu 24.04 with
+CMake/CTest 3.21.7. The minimum entry verifies the official tool archive's
+SHA256, prints and checks both tool versions, runs configure/build/all CTest
+cases, and installs into a temporary prefix.
+
+External dependencies are built with the runner's CMake before selecting the
+minimum version for `td`; their own source-build requirements are separate from
+the requirements for consuming their installed packages. The minimum entry
+checks installation execution, not installed runtime behavior or uninstall.
+When changing CMake commands or options, preserve compatibility with 3.21 and
+verify the affected paths with the minimum tool as well as the normal build.
 
 ### Docker Probe
 
