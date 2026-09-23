@@ -159,9 +159,8 @@ Temporary Items
 /xsum*.out
 /refs/
 
-# New superpowers planning artifacts stay local; tracked history is retained.
-/docs/superpowers/specs/
-/docs/superpowers/plans/
+# Agent planning artifacts stay local, including process notes.
+/docs/superpowers/
 
 # Ninja/CTest extras
 *.ninja
