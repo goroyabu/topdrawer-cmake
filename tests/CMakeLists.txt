@@ -257,3 +257,35 @@ add_td_postscript_compare_case(
   LEFT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/duplex_glyph_a.top"
   RIGHT_INPUT "${TD_POSTSCRIPT_FIXTURES_DIR}/duplex_glyph_two.top"
 )
+
+# Acquisition tests use synthetic inputs and local file URLs, without networking.
+foreach(_case
+  local_valid
+  local_mismatch_strict
+  cache_valid
+  cache_mismatch_strict
+  download_valid
+  download_mismatch_strict
+  no_fallback_after_mismatch
+  local_mismatch_allowed
+  cache_mismatch_allowed
+  download_mismatch_allowed
+  valid_archive_allowed_mode_warning
+  no_fallback_after_mismatch_allowed
+  missing_input_allowed
+  download_failure_allowed
+  hint_precedence
+  archive_directory_fallback
+  cache_no_fallback
+  offline_cache_strict
+  download_failure_strict)
+  add_test(NAME "archive_hash.${_case}"
+    COMMAND "${CMAKE_COMMAND}"
+      "-DTEST_CASE=${_case}"
+      "-DFETCH_MODULE=${PROJECT_SOURCE_DIR}/cmake/FetchAndUnpack.cmake"
+      "-DTEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/archive-hash-tests/${_case}"
+      "-DRESOLVE_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/archive_hash/ResolveArchive.cmake"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/archive_hash/RunArchiveHashTest.cmake")
+  set_tests_properties("archive_hash.${_case}" PROPERTIES
+    LABELS "archive-integrity" TIMEOUT 30)
+endforeach()
