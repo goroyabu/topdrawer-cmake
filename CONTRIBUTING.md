@@ -42,7 +42,7 @@ repurposed.
   across clean reconfigures and future upstream archive refreshes.
 - Prefer patches that address compiler, linker, packaging, or portability issues
   over behavioral rewrites.
-- Document the reason for non-obvious patches in code comments, design records,
+- Document the reason for non-obvious patches in code comments, Issues, PRs,
   or commit messages, especially when they correspond to a specific toolchain
   breakage.
 
@@ -68,6 +68,9 @@ repurposed.
 - When an issue number is useful context, include it after the type rather than
   replacing the type, for example `tests/issue-25-axis-postscript-fixture`.
 - Merge changes into `main` through a pull request.
+- Confirm the relevant CI checks pass before merging. Use a merge commit to
+  preserve PR boundaries and individual commits; do not squash or rebase PRs
+  into `main`.
 - The repository protects `main` so normal changes must go through pull
   requests.
 - GitHub is configured to delete merged head branches automatically.
@@ -78,26 +81,9 @@ repurposed.
 - If build or test automation depends on external dependencies, add a
   reproducible bootstrap path before making those checks required.
 
-## Superpowers Process
-
-Use `docs/superpowers/process.md` when a change needs traceability across design,
-implementation planning, verification, and review.
-
-Do not add new superpowers specifications, implementation plans, or temporary
-planning records to Git. Keep these as ignored local notes, or record decisions,
-plans, and verification in the relevant Issue or PR after the required approval
-for that external write. Incorporate durable changes to the current project
-contract into README, CONTRIBUTING, or other canonical documentation.
-
-The `docs/superpowers/specs/` and `docs/superpowers/plans/` directories are
-ignored for new files. Existing tracked records remain historical references;
-their removal or migration is separate work. This policy takes precedence over
-skill instructions to create or commit versioned planning artifacts.
-
-The full superpowers workflow is not required for every change. Use it for work
-with lasting design or execution value, such as changes to build logic,
-dependency discovery, archive handling, source patching, CI, packaging, test
-strategy, fixture policy, or user-facing workflows.
+Use English for shared documentation, code comments, commits, Issues, and PRs.
+After a remote merge, verify the resulting state, synchronize local `main`,
+and remove the merged topic branch when no longer needed.
 
 ## Testing and Verification
 
@@ -146,7 +132,31 @@ and avoid relying on interactive X11 behavior.
 If packaging behavior changes, verify both installation results and any
 documented runtime assets such as help files.
 
+Follow [tests/README.md](tests/README.md) for fixture selection, test guarantees,
+and limitations. Record commands actually run, results, and any missing checks
+in the PR; do not infer visual correctness from process or file-output checks.
+
 ## Documentation
+
+Keep the current project contract in canonical, self-contained documentation:
+user workflows in README, development procedures here, and test policy in
+`tests/README.md`. AGENTS provides stable boundaries and pointers, not duplicate
+procedures. Issues and PRs hold decisions, implementation plans, and progress;
+readers should not need their history to understand current behavior.
+
+Do not commit agent- or tool-generated specifications, implementation plans,
+or temporary planning records, including superpowers documents. Keep local
+notes untracked; `docs/superpowers/` is ignored in full. This policy takes
+precedence over skill instructions to create or commit planning artifacts.
+Record relevant decisions and verification in the Issue or PR after approval
+for that external write, as required by AGENTS. A skill or maintenance policy
+does not itself authorize external writes. Historical records remain in Git
+history rather than being copied into new planning documents.
+
+A separate Issue or plan is not needed for every small correction. Reuse an
+existing Issue for substantial work when it covers the scope. PRs should
+explain the problem, resulting behavior, related Issue, verification, and
+remaining limitations without depending on ignored local notes.
 
 - Keep README content focused on user-facing build, install, usage, and
   troubleshooting guidance.

@@ -130,7 +130,7 @@ cmake -S . -B build \
   -DBUILD_TESTING=ON
 ```
 
-To run the smoke tests:
+To run the full test suite:
 
 ```sh
 ctest --test-dir build --output-on-failure
@@ -144,6 +144,8 @@ ctest --test-dir build -L postscript --output-on-failure
 
 Maintainer-focused verification guidance, including when to use broader checks
 such as the Docker probe, lives in `CONTRIBUTING.md`.
+See [tests/README.md](tests/README.md) for test selection, coverage limitations,
+and fixture policy.
 
 ---
 
