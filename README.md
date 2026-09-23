@@ -52,17 +52,39 @@ This project builds Topdrawer from an upstream tarball:
 - Upstream URL:  
   `http://ftp.riken.go.jp/iris/OLD/topdrawer/topdrawer_20071207.tar.gz`
 
-- To work **offline**, download `topdrawer_20071207.tar.gz` in advance and place it in:
+The resolver first selects an existing explicit local hint (the archive path below
+in the normal build), then `ARCHIVE_DIR/<archive name>`. With `NET_FETCH=ON`
+(the default), it next reuses `DOWNLOAD_CACHE_DIR/<archive name>` or downloads
+there if absent. The defaults are `archives/` and `.cache/downloads/` under the
+repository root; both directories can be overridden with CMake options.
 
-  ```text
-  <repository-root>/archives/topdrawer_20071207.tar.gz
-  ```
+For an offline build, place the archive in `archives/` (or your `ARCHIVE_DIR`)
+and configure with `-DNET_FETCH=OFF`. **OFF does not read the download cache**:
+a missing local archive is an error even when a cached download exists.
 
-- Otherwise, the configure step will automatically download the archive into the
-  local download cache when needed.
+Every selected archive is checked against the SHA256 pinned in `CMakeLists.txt`
+before extraction, including local files and existing cached downloads. A
+mismatch stops configuration and reports the file, expected hash, and actual
+hash. Selection never silently falls back to a different copy after a mismatch.
+Replace the selected file with the expected archive before retrying.
 
-If neither a local archive nor a downloadable copy is available, CMake will stop
-at configure time and tell you where to place the tarball manually.
+To deliberately use a modified archive, opt in explicitly:
+
+```sh
+cmake -S . -B build -DTD_ALLOW_UNVERIFIED_ARCHIVES=ON
+```
+
+This option defaults to OFF. When ON, CMake still computes the hash but warns
+and continues with the selected mismatched file. It also warns at each
+configuration even if the hash matches. This mode is outside standard support
+and is not suitable for CI or release builds. The setting persists in the build
+cache; pass `-DTD_ALLOW_UNVERIFIED_ARCHIVES=OFF` to restore strict verification.
+
+The option does not bypass missing files, download errors, or extraction errors.
+Failed downloads stop configuration with their URL, destination, and reason;
+the newly failed download is removed so a retry does not reuse it. Existing
+local/cache files and completed downloads with mismatched hashes are retained
+for inspection.
 
 ---
 

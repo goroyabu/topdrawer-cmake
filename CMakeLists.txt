@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.21)
 project(td VERSION 0.2.0 LANGUAGES C Fortran)
 
+# ------------------------------------------------------------
+# Options
+# ------------------------------------------------------------
+option(NET_FETCH "Allow CMake to download upstream archives when they are missing." ON)
+
+option(TD_ALLOW_UNVERIFIED_ARCHIVES
+  "Allow SHA256-mismatched upstream archives with warnings (not for CI or releases)." OFF)
+
 include(GNUInstallDirs)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -18,11 +26,6 @@ message(STATUS "X11_Xmu_LIB = ${X11_Xmu_LIB}")
 message(STATUS "X11_Xt_LIB = ${X11_Xt_LIB}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# ------------------------------------------------------------
-# Options
-# ------------------------------------------------------------
-option(NET_FETCH "Allow CMake to download upstream archives when they are missing." ON)
 
 # ------------------------------------------------------------
 # Layout / Source acquisition
