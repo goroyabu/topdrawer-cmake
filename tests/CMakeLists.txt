@@ -289,3 +289,84 @@ foreach(_case
   set_tests_properties("archive_hash.${_case}" PROPERTIES
     LABELS "archive-integrity" TIMEOUT 30)
 endforeach()
+
+# These direct ABI probes currently qualify GNU Fortran only.
+option(TD_HELPER_SANITIZERS "Instrument the legacy helper probes with ASan/UBSan" OFF)
+if(TD_HELPER_SANITIZERS AND NOT (CMAKE_Fortran_COMPILER_ID STREQUAL "GNU"
+    AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" AND CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+  message(FATAL_ERROR "TD_HELPER_SANITIZERS currently requires GNU Fortran and GCC/Clang on Linux")
+endif()
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
+  # Extract the actual prepared routines, including their EXTERNAL declarations.
+  # This avoids a second hand-maintained implementation of the TD call sites.
+  file(READ "${TOPDRAWER_SRC_DIR}/help.f" _help_source)
+  set(_helper_routines "${CMAKE_CURRENT_BINARY_DIR}/legacy-helper-routines.f")
+  file(WRITE "${_helper_routines}" "")
+  foreach(_name RELTIM T2_WAIT TDTIME DATE)
+    if(_name STREQUAL "RELTIM")
+      set(_prefix "      REAL FUNCTION ${_name}(")
+    else()
+      set(_prefix "      SUBROUTINE ${_name}(")
+    endif()
+    string(FIND "${_help_source}" "${_prefix}" _start)
+    if(_start LESS 0)
+      message(FATAL_ERROR "Cannot locate upstream helper ${_name}")
+    endif()
+    string(SUBSTRING "${_help_source}" ${_start} -1 _tail)
+    string(FIND "${_tail}" "\n      END\n" _end)
+    if(_end LESS 0)
+      message(FATAL_ERROR "Cannot locate end of upstream helper ${_name}")
+    endif()
+    math(EXPR _length "${_end} + 11")
+    string(SUBSTRING "${_tail}" 0 ${_length} _routine)
+    file(APPEND "${_helper_routines}" "${_routine}\n")
+  endforeach()
+
+  add_library(td_helper_objects OBJECT
+    "${TOPDRAWER_MISC_DIR}/exit.c" "${TOPDRAWER_MISC_DIR}/fdate.c"
+    legacy_helpers/TimeAbi.c)
+  target_include_directories(td_helper_objects PRIVATE "${TOPDRAWER_MISC_DIR}")
+  target_link_libraries(td_helper_objects PRIVATE f2c::f2c_runtime)
+  if(F2C_INCLUDE_DIR)
+    target_include_directories(td_helper_objects PRIVATE "${F2C_INCLUDE_DIR}")
+  endif()
+  set_target_properties(td_helper_objects PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
+  add_executable(td_helper_probe legacy_helpers/Probe.f90 "${_helper_routines}")
+  add_executable(td_exit_probe legacy_helpers/ExitProbe.f90)
+  foreach(_target td_helper_probe td_exit_probe)
+    target_link_libraries(${_target} PRIVATE td_helper_objects f2c::f2c_runtime)
+    target_compile_options(${_target} PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:-std=legacy>)
+  endforeach()
+  if(TD_HELPER_SANITIZERS)
+    foreach(_target td_helper_objects td_helper_probe td_exit_probe)
+      target_compile_options(${_target} PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
+    endforeach()
+    foreach(_target td_helper_probe td_exit_probe)
+      target_link_options(${_target} PRIVATE -fsanitize=address,undefined)
+    endforeach()
+  endif()
+  foreach(_case datetime short long exit0 exit3)
+    set(_target td_helper_probe)
+    set(_mode "${_case}")
+    set(_exit 0)
+    if(_case MATCHES "^exit([03])$")
+      set(_target td_exit_probe)
+      set(_mode "${CMAKE_MATCH_1}")
+      set(_exit "${_mode}")
+    elseif(_case STREQUAL "short" OR _case STREQUAL "long")
+      set(_exit 1)
+    endif()
+    add_test(NAME "legacy_helpers.${_case}" COMMAND "${CMAKE_COMMAND}"
+      "-DPROGRAM=$<TARGET_FILE:${_target}>" "-DMODE=${_mode}"
+      "-DEXPECTED_EXIT=${_exit}"
+      "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/legacy-helpers/${_case}"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/legacy_helpers/RunProbe.cmake")
+    set_tests_properties("legacy_helpers.${_case}" PROPERTIES
+      LABELS "helper-contract" TIMEOUT 20
+      ENVIRONMENT "LC_ALL=C;TZ=UTC;ASAN_OPTIONS=detect_leaks=0;UBSAN_OPTIONS=halt_on_error=1")
+  endforeach()
+  add_test(NAME legacy_helpers.linkage COMMAND "${CMAKE_COMMAND}"
+    "-DNM=${CMAKE_NM}" "-DPROGRAM=$<TARGET_FILE:td>"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/legacy_helpers/VerifySymbols.cmake")
+  set_tests_properties(legacy_helpers.linkage PROPERTIES LABELS "helper-contract" TIMEOUT 20)
+endif()
