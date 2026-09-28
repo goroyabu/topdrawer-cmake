@@ -7,6 +7,13 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-and-test:
     name: ${{ matrix.name }}
@@ -16,29 +23,90 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: build-and-test
-            os: ubuntu-latest
+          - name: Ubuntu 24.04 GNU Fortran 13
+            os: ubuntu-24.04
             cmake_version: ""
+            fetch_mode: "ON"
           - name: Minimum CMake 3.21.7
             os: ubuntu-24.04
             cmake_version: "3.21.7"
+            fetch_mode: "ON"
+          - name: macOS 15 arm64 GNU Fortran 15
+            os: macos-15
+            cmake_version: ""
+            fetch_mode: "ON"
+          - name: Ubuntu 24.04 offline acquisition
+            os: ubuntu-24.04
+            cmake_version: ""
+            fetch_mode: "OFF"
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Install Ubuntu dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             cmake \
             ninja-build \
-            gfortran \
+            gcc-13 \
+            gfortran-13 \
             libx11-dev \
             libxmu-dev \
             libxaw7-dev \
             libxt-dev \
             libice-dev \
             libsm-dev
+          echo "FC=$(command -v gfortran-13)" >> "$GITHUB_ENV"
+          echo "CC=$(command -v gcc-13)" >> "$GITHUB_ENV"
+          echo "TD_CMAKE_PREFIX_PATH=$RUNNER_TEMP/prefix" >> "$GITHUB_ENV"
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: |
+          brew install gcc@15 libx11 libxaw libxmu libxt
+          brew_prefix="$(brew --prefix)"
+          echo "FC=$(brew --prefix gcc@15)/bin/gfortran-15" >> "$GITHUB_ENV"
+          echo "CC=$(command -v clang)" >> "$GITHUB_ENV"
+          echo "TD_CMAKE_PREFIX_PATH=$RUNNER_TEMP/prefix;$brew_prefix" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=$brew_prefix" >> "$GITHUB_ENV"
+          echo "CPPFLAGS=-I$brew_prefix/include" >> "$GITHUB_ENV"
+          echo "LDFLAGS=-L$brew_prefix/lib" >> "$GITHUB_ENV"
+
+      - name: Show platform and compiler versions
+        run: |
+          uname -sm
+          "$CC" --version
+          "$FC" --version
+          cmake --version
+          ctest --version
+
+      - name: Prepare verified offline archives
+        if: matrix.fetch_mode == 'OFF'
+        run: |
+          mkdir -p "$RUNNER_TEMP/archives"
+          curl --fail --show-error --location --retry 3 \
+            https://www.netlib.org/f2c/src.tgz \
+            --output "$RUNNER_TEMP/archives/src.tgz"
+          curl --fail --show-error --location --retry 3 \
+            https://www.netlib.org/f2c/libf2c.zip \
+            --output "$RUNNER_TEMP/archives/libf2c.zip"
+          curl --fail --show-error --location --retry 3 \
+            https://ftp.riken.jp/iris/ugs/ugs.tar.gz \
+            --output "$RUNNER_TEMP/archives/ugs.tar.gz"
+          curl --fail --show-error --location --retry 3 \
+            https://ftp.riken.jp/iris/OLD/topdrawer/topdrawer_20071207.tar.gz \
+            --output "$RUNNER_TEMP/archives/topdrawer_20071207.tar.gz"
+          cd "$RUNNER_TEMP/archives"
+          printf '%s\n' \
+            'b2824a6f7b75ffe0193ce9ba55463191a7af7c2ffe10e371e372451e2b527e09  src.tgz' \
+            'cc84253b47b5c036aa1d529332a6c218a39ff71c76974296262b03776f822695  libf2c.zip' \
+            '27bc46e975917bdf149e9ff6997885ffa24b0b1416bdf82ffaea5246b36e1f83  ugs.tar.gz' \
+            'a3c00ee7b4265bfe56040fa6640f1f2bf9fc2e594117bc84464f26b000c8539f  topdrawer_20071207.tar.gz' \
+            | sha256sum --check -
 
       - name: Build and install f2c
         run: |
@@ -50,7 +118,8 @@ jobs:
           test "$(git -C "$RUNNER_TEMP/f2c" rev-parse HEAD)" = ac0e647082d720a3da5e4442578f3a2c7a98d47c
           cmake -S "$RUNNER_TEMP/f2c" -B "$RUNNER_TEMP/f2c-build" \
             -G Ninja \
-            -DNET_FETCH=ON \
+            -DNET_FETCH=${{ matrix.fetch_mode }} \
+            -DARCHIVE_DIR="$RUNNER_TEMP/archives" \
             -DBUILD_TESTING=OFF \
             -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/prefix"
           cmake --build "$RUNNER_TEMP/f2c-build" --parallel
@@ -66,7 +135,8 @@ jobs:
           test "$(git -C "$RUNNER_TEMP/ugs" rev-parse HEAD)" = d392fef5487dae6c08a058380d23dd427bcdfd35
           cmake -S "$RUNNER_TEMP/ugs" -B "$RUNNER_TEMP/ugs-build" \
             -G Ninja \
-            -DNET_FETCH=ON \
+            -DNET_FETCH=${{ matrix.fetch_mode }} \
+            -DARCHIVE_DIR="$RUNNER_TEMP/archives" \
             -DBUILD_TESTING=OFF \
             -DUGS_ENABLE_GUI_SMOKE=OFF \
             -DCMAKE_INSTALL_PREFIX="$RUNNER_TEMP/prefix"
@@ -104,15 +174,24 @@ jobs:
         run: |
           cmake -S . -B build \
             -G Ninja \
-            -DNET_FETCH=ON \
+            -DNET_FETCH=${{ matrix.fetch_mode }} \
+            -DARCHIVE_DIR="$RUNNER_TEMP/archives" \
             -DBUILD_TESTING=ON \
-            -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/prefix"
+            -DCMAKE_PREFIX_PATH="$TD_CMAKE_PREFIX_PATH"
 
       - name: Build td
         run: cmake --build build --parallel
 
       - name: Test td
-        run: ctest --test-dir build --output-on-failure
+        run: |
+          unset DISPLAY
+          ctest --test-dir build --timeout 60 --output-on-failure
+
+      - name: Show configure and test diagnostics
+        if: failure()
+        run: |
+          find "$RUNNER_TEMP" build -type f \( -name CMakeError.log -o -name CMakeConfigureLog.yaml -o -name LastTest.log \) \
+            -print -exec tail -n 120 {} \; 2>/dev/null || true
 
       - name: Install td with minimum CMake
         if: matrix.cmake_version != ''

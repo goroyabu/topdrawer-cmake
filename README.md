@@ -65,6 +65,27 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#updating-the-dependency-baseline) for upda
 
 ---
 
+## CI verification configurations
+
+The CI workflow is configured to build the pinned f2c and UGS wrappers and run the
+display-independent CTest suite in these configurations:
+
+| Runner | C compiler | Fortran compiler | Source acquisition |
+|---|---|---|---|
+| Ubuntu 24.04 x86_64 | GCC 13 | GNU Fortran 13 | `NET_FETCH=ON` |
+| Ubuntu 24.04 x86_64 | GCC 13 | GNU Fortran 13 | `NET_FETCH=ON`; CMake/CTest 3.21.7 |
+| macOS 15 arm64 | Apple Clang | GNU Fortran 15 | `NET_FETCH=ON` |
+| Ubuntu 24.04 x86_64 | GCC 13 | GNU Fortran 13 | `NET_FETCH=OFF` for f2c, UGS, and td after verified archives are supplied |
+
+Runner images and compiler patch versions can change; the jobs print their
+actual versions. The offline job fetches and verifies archives before the
+three source builds. `NET_FETCH=OFF` checks each wrapper's archive selection,
+not network isolation of the entire job. The tests do not require a display,
+but they do not prove interactive X11 behavior or visual correctness of
+PostScript output. Installed td/help runtime behavior is a separate check.
+
+---
+
 ## Repository layout
 
 - `archives/` (optional): place a local copy of the Topdrawer source archive here

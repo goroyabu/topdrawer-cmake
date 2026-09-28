@@ -123,11 +123,13 @@ ctest --test-dir build --output-on-failure
 
 Run `cmake --install build --prefix <prefix>` when install behavior changes.
 
-Use CMake and CTest 3.21 or newer throughout the workflow. CI retains the
-default Ubuntu build and adds a minimum-version entry on Ubuntu 24.04 with
-CMake/CTest 3.21.7. The minimum entry verifies the official tool archive's
-SHA256, prints and checks both tool versions, runs configure/build/all CTest
-cases, and installs into a temporary prefix.
+Use CMake and CTest 3.21 or newer throughout the workflow. CI runs the
+display-independent suite on Ubuntu 24.04 with GNU Fortran 13, macOS 15 arm64
+with GNU Fortran 15, and Ubuntu 24.04 with preverified archives and
+`NET_FETCH=OFF`. A separate Ubuntu 24.04 entry uses CMake/CTest 3.21.7. It
+verifies the official tool archive's SHA256, prints and checks both tool
+versions, runs configure/build/all CTest cases, and installs into a temporary
+prefix. All entries build the pinned f2c and UGS releases in a fresh prefix.
 
 External dependencies are built with the runner's CMake before selecting the
 minimum version for `td`; their own source-build requirements are separate from
@@ -135,6 +137,24 @@ the requirements for consuming their installed packages. The minimum entry
 checks installation execution, not installed runtime behavior or uninstall.
 When changing CMake commands or options, preserve compatibility with 3.21 and
 verify the affected paths with the minimum tool as well as the normal build.
+
+The offline CI entry prepares `src.tgz`, `libf2c.zip`, `ugs.tar.gz`, and
+`topdrawer_20071207.tar.gz` in a temporary archive directory, checks their
+pinned SHA256 values, and then configures f2c, UGS, and td with
+`NET_FETCH=OFF` and that directory. This verifies archive acquisition mode
+for the three wrappers. The runner still uses the network to install system
+packages, fetch dependency commits, and prepare archives. It is not a test of
+whole-job network isolation. For a local equivalent, prepare those four
+hash-verified archives, configure each wrapper into a fresh build directory
+with `-DNET_FETCH=OFF -DARCHIVE_DIR=<archive-dir>`, install f2c and UGS into
+a temporary prefix, and configure td with the same archive options plus
+`-DCMAKE_PREFIX_PATH=<prefix>`. Build and run the full CTest suite.
+
+The Docker probe below checks the Ubuntu path locally. Use the four CI entries
+for macOS and offline acquisition coverage; local Linux success alone cannot
+establish those results. CI bounds each CTest case to 60 seconds and prints
+configure/test logs after a failure. Test success does not establish rendered
+visual correctness or interactive X11 behavior.
 
 ### Docker Probe
 
