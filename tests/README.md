@@ -20,6 +20,7 @@ Select tests by label:
 
 ```sh
 ctest --test-dir build -L archive-integrity --output-on-failure
+ctest --test-dir build -L helper-contract --output-on-failure
 ctest --test-dir build -L smoke --output-on-failure
 ctest --test-dir build -L postscript --output-on-failure
 ctest --test-dir build -L ps_structure --output-on-failure
@@ -36,6 +37,7 @@ f2c and UGS. Keep test registration in `tests/CMakeLists.txt` for now.
 
 - `archive_hash/`: archive selection and integrity tests, including their
   dedicated CMake runners. Inputs are generated in the build tree.
+- `legacy_helpers/`: direct upstream helper, ABI, and linkage probes.
 - `cases/`: executable smoke inputs and expected text.
 - `postscript/fixtures/`: PostScript behavior inputs and companion data.
 - `cmake/`: shared runners for executable and PostScript cases.
@@ -50,13 +52,16 @@ cases do not need to move when a new suite is added.
 
 ## Current Guarantees and Limits
 
-The suite has 47 tests: 28 executable tests and 19 archive acquisition tests.
+The suite has 53 tests with GNU Fortran: 28 executable tests, 19 archive
+acquisition tests, and 6 helper contract tests. The helper tests are currently
+registered only for GNU Fortran; other compilers retain the 47 existing tests.
 PostScript tests also check execution status and known
 Topdrawer/UGS error messages; a successful process alone is insufficient.
 
 | Group | Count | Checks | Does not establish |
 |---|---:|---|---|
 | Archive integrity | 19 | Selection, hash enforcement, override warnings, and failure handling | Archive-format validity or upstream availability |
+| Helper contract | 6 | Date/time and wait behavior, exit status and pending output, FDATE length rejection, and linked helper symbols | Other Fortran compiler ABIs or exhaustive runtime behavior |
 | Smoke | 6 | Process success, expected text, and absence of known error messages | Correct rendered output |
 | PostScript I/O | 9 | Expected file exists and is nonempty | Valid or correct drawing |
 | PostScript structure | 8 | Nonempty output plus PS header, BoundingBox, and showpage markers | Correct coordinates, labels, or glyphs |
@@ -84,6 +89,35 @@ Mismatched files must remain unchanged, and failed resolution must not return a
 path for extraction. These tests verify acquisition, not archive-format validity
 or upstream server availability. Normal configure/build checks exercise actual
 source extraction separately.
+
+## Legacy Helper Contracts
+
+The `helper-contract` suite exercises the patched upstream C helpers. Its
+date/time probe uses routines extracted from the prepared `help.f`, including
+the production external declarations, rather than copies of their logic.
+It checks date/time formatting and elapsed time across a one-second wait.
+Separate cases check exit statuses 0 and 3 and pending Fortran file output,
+and require FDATE to reject 8- and 32-character buffers with the expected
+diagnostic. Normal date/time calls exercise its required 24-character buffer.
+A compile-time assertion checks that TIME returns four bytes. A symbol check
+requires `exit_`, `time_`, `fdate_`, and `s_copy` in the built `td`; this confirms
+their inclusion, not every call path through them.
+
+For memory and undefined-behavior checks on Linux with GNU Fortran and GCC or
+Clang, configure a separate build with the normal dependency settings:
+
+```sh
+cmake -S . -B build-helper-asan -DBUILD_TESTING=ON -DTD_HELPER_SANITIZERS=ON
+cmake --build build-helper-asan --parallel
+ctest --test-dir build-helper-asan -L helper-contract --output-on-failure
+```
+
+This option instruments the probe executables and their helper objects, not
+the full `td` executable or the installed f2c library. Leak detection is disabled;
+address and undefined-behavior errors remain fatal. These probes currently
+qualify the modern GNU Fortran ABI only. They do not establish support for
+other compilers, dates beyond the four-byte TIME range, or the unused
+`ctime_`, `ltime_`, and `gmtime_` helpers.
 
 ## Fixture and Assertion Policy
 

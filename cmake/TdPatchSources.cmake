@@ -124,9 +124,40 @@ td_comment_out_lines("${_td_src_dir}/help_.c"
 td_insert_after_first_line("${_td_src_dir}/readx_.c" "#include <string.h>")
 
 td_prepend_if_missing("${_td_misc_dir}/exit.c" "#include <stdlib.h>")
+# Local experiment: GNU Fortran's default INTEGER argument is four bytes.
+td_prepend_if_missing("${_td_misc_dir}/exit.c" "#include <stdint.h>")
+td_replace_string("${_td_misc_dir}/exit.c"
+    "integer *status;"
+    "int32_t *status;")
 td_insert_before_token("${_td_misc_dir}/fdate.c" "VOID fdate_" "void s_copy(char *, char *, ftnlen, ftnlen);")
+# Local experiment: match INTEGER*4 and modern GNU Fortran character lengths.
+td_prepend_if_missing("${_td_misc_dir}/time.c" "#include <stdint.h>")
+td_replace_string("${_td_misc_dir}/time.c"
+    "integer time_()"
+    "int32_t time_(void)")
+td_prepend_if_missing("${_td_misc_dir}/fdate.c" "#include <stddef.h>")
+td_prepend_if_missing("${_td_misc_dir}/fdate.c" "#include <stdio.h>")
+td_prepend_if_missing("${_td_misc_dir}/fdate.c" "#include <stdlib.h>")
+td_replace_string("${_td_misc_dir}/fdate.c"
+    "ftnlen ret_val_len;"
+    "size_t ret_val_len;")
+td_insert_before_token("${_td_misc_dir}/fdate.c" "    time(&tp);"
+    "    if (ret_val_len != 24) {\n        fputs(\"Topdrawer FDATE requires a 24-character result buffer.\\n\", stderr);\n        exit(EXIT_FAILURE);\n    }")
 
 # Fortran source adjustments
+# Local experiment: select the upstream external helpers instead of intrinsics.
+td_replace_string("${_td_src_dir}/td.f"
+    "      PROGRAM TD\n      IMPLICIT NONE\n      INTEGER PUTENV"
+    "      PROGRAM TD\n      IMPLICIT NONE\n      EXTERNAL EXIT\n      INTEGER PUTENV")
+td_replace_string("${_td_src_dir}/help.f"
+    "      INTEGER*4 TIME, ORIGIN\n      REAL OLDTIM"
+    "      INTEGER*4 TIME, ORIGIN\n      EXTERNAL TIME\n      REAL OLDTIM")
+td_replace_string("${_td_src_dir}/help.f"
+    "      CHARACTER*24  FSTR, FDATE\n      FSTR = FDATE ( )"
+    "      CHARACTER*24  FSTR, FDATE\n      EXTERNAL FDATE\n      FSTR = FDATE ( )")
+td_replace_string("${_td_src_dir}/help.f"
+    "      CHARACTER*24   FSTR, FDATE\n*  Format of FSTR"
+    "      CHARACTER*24   FSTR, FDATE\n      EXTERNAL FDATE\n*  Format of FSTR")
 td_replace_string("${_td_src_dir}/t2del.f"
     "      JTEST1=ICHAR(CXYZ(IXYZ))"
     "      JTEST1=ICHAR(CXYZ(IXYZ)(1:1))")

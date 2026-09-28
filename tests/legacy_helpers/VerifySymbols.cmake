@@ -1,0 +1,10 @@
+execute_process(COMMAND "${NM}" -g "${PROGRAM}"
+  RESULT_VARIABLE result OUTPUT_VARIABLE symbols ERROR_VARIABLE error)
+if(NOT result EQUAL 0)
+  message(FATAL_ERROR "Cannot inspect helper symbols: ${error}")
+endif()
+foreach(name exit_ time_ fdate_ s_copy)
+  if(NOT symbols MATCHES "(^|\n)[^\n]*[ \t]T[ \t]_?${name}(\n|$)")
+    message(FATAL_ERROR "The td executable does not define upstream helper ${name}")
+  endif()
+endforeach()
