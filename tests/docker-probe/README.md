@@ -12,8 +12,8 @@ The default probe:
 
 - builds an Ubuntu 24.04 image;
 - installs system build dependencies;
-- clones, builds, and installs `f2c`;
-- clones, builds, and installs `ugs`;
+- fetches the pinned f2c and UGS commits, verifies their checkout IDs, and
+  builds and installs them (see the [baseline table](../../README.md#dependency-baseline));
 - configures this repository with `BUILD_TESTING=ON`;
 - builds `td`;
 - runs `ctest --test-dir /tmp/td-build --output-on-failure`.
@@ -25,8 +25,8 @@ behavior.
 ## Prerequisites
 
 - Docker with Compose support.
-- Network access while building the image, because the image clones `f2c` and
-  `ugs`.
+- Network access while building the image, to fetch dependency commits and
+  their upstream archives.
 - Enough time for a full dependency bootstrap. The probe is slower than a local
   incremental CMake build.
 

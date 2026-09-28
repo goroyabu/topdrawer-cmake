@@ -16,12 +16,12 @@ modifying the upstream sources in place.
   installing this project.
 - A C compiler (Clang, GCC, …).
 - A Fortran compiler (e.g. `gfortran`).
-- An installed **f2c** package that provides a CMake config file and the runtime
+- An installed **f2c 0.5.0 or newer compatible** wrapper package that provides a CMake config file and the runtime
   library target:
-  - `f2cConfig.cmake` on CMake's module path.
+  - `f2cConfig.cmake` and its package version file under the installation prefix.
   - An imported target `f2c::f2c_runtime` (static `libf2c.a`).
-- An installed **UGS** library with a CMake config file:
-  - `ugsConfig.cmake` on CMake's module path.
+- An installed **UGS 0.3.0 or newer compatible** wrapper package:
+  - `ugsConfig.cmake` and its package version file under the installation prefix.
   - An imported target `ugs::ugs`.
 - X11 development libraries:
   - `Xt`, `Xmu`, `Xaw`, `X11`, `Xext`, `SM`, `ICE` (names may vary by platform).
@@ -32,6 +32,36 @@ to `CMAKE_PREFIX_PATH`, for example:
 ```sh
 cmake -S . -B build -DCMAKE_PREFIX_PATH="$HOME/.local"
 ```
+
+---
+
+## Dependency baseline
+
+The minimum supported wrapper versions are f2c 0.5.0 and UGS 0.3.0. CMake
+requires versioned config packages and uses their compatibility declarations;
+packages below these versions or without version metadata are rejected.
+These are support-policy minimums, not a claim that every older version fails.
+They refer to the CMake wrappers, not the original upstream source versions.
+Newer compatible packages may be selected by CMake, but are not automatically
+part of the tested baseline.
+
+CI and the Docker probe build this exact combination from full commit IDs:
+
+| Dependency | Wrapper release | Commit |
+|---|---|---|
+| f2c | v0.5.0 | `ac0e647082d720a3da5e4442578f3a2c7a98d47c` |
+| UGS | v0.3.0 | `d392fef5487dae6c08a058380d23dd427bcdfd35` |
+
+td uses the f2c runtime through the upstream date/time helpers' `s_copy`
+calls. The UGS baseline contains the little-endian DUPLEX glyph fix
+(`d5cf212`) and PostScript filename fix (`d30e25b`), associated with td
+issues [#24](https://github.com/goroyabu/topdrawer-cmake/issues/24) and
+[#27](https://github.com/goroyabu/topdrawer-cmake/issues/27).
+
+The pins apply to dependency source acquisition for verification. Normal td
+builds consume installed packages and do not fetch or vendor these libraries.
+System compilers, X11, and OS packages are not pinned by this baseline.
+See [CONTRIBUTING.md](CONTRIBUTING.md#updating-the-dependency-baseline) for updates.
 
 ---
 
@@ -214,6 +244,9 @@ If `find_package(ugs)` or `find_package(f2c)` fails:
 - Verify that those packages are installed and provide CMake config files:
   - `.../lib/cmake/ugs/ugsConfig.cmake`
   - `.../lib/cmake/f2c/f2cConfig.cmake`
+- Check the reported wrapper versions against the minimums above. A package
+  without a corresponding `ConfigVersion.cmake` cannot satisfy the versioned
+  request; install a supported wrapper release rather than bypassing the check.
 - Add their root prefix to `CMAKE_PREFIX_PATH` when configuring:
 
   ```sh

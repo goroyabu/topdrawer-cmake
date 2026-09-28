@@ -17,7 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ninja-build \
   && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --depth=1 https://github.com/goroyabu/f2c.git /tmp/f2c \
+# f2c v0.5.0; keep aligned with CI and the README baseline.
+RUN git init /tmp/f2c \
+  && git -C /tmp/f2c remote add origin https://github.com/goroyabu/f2c.git \
+  && git -C /tmp/f2c fetch --depth=1 origin ac0e647082d720a3da5e4442578f3a2c7a98d47c \
+  && git -C /tmp/f2c checkout --detach ac0e647082d720a3da5e4442578f3a2c7a98d47c \
+  && test "$(git -C /tmp/f2c rev-parse HEAD)" = ac0e647082d720a3da5e4442578f3a2c7a98d47c \
   && cmake -S /tmp/f2c -B /tmp/f2c-build \
     -G Ninja \
     -DNET_FETCH=ON \
@@ -27,7 +32,12 @@ RUN git clone --depth=1 https://github.com/goroyabu/f2c.git /tmp/f2c \
   && cmake --install /tmp/f2c-build \
   && rm -rf /tmp/f2c /tmp/f2c-build
 
-RUN git clone --depth=1 https://github.com/goroyabu/ugs.git /tmp/ugs \
+# ugs v0.3.0; keep aligned with CI and the README baseline.
+RUN git init /tmp/ugs \
+  && git -C /tmp/ugs remote add origin https://github.com/goroyabu/ugs.git \
+  && git -C /tmp/ugs fetch --depth=1 origin d392fef5487dae6c08a058380d23dd427bcdfd35 \
+  && git -C /tmp/ugs checkout --detach d392fef5487dae6c08a058380d23dd427bcdfd35 \
+  && test "$(git -C /tmp/ugs rev-parse HEAD)" = d392fef5487dae6c08a058380d23dd427bcdfd35 \
   && cmake -S /tmp/ugs -B /tmp/ugs-build \
     -G Ninja \
     -DNET_FETCH=ON \

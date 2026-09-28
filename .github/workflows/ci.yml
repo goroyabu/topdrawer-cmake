@@ -42,7 +42,12 @@ jobs:
 
       - name: Build and install f2c
         run: |
-          git clone --depth=1 https://github.com/goroyabu/f2c.git "$RUNNER_TEMP/f2c"
+          # f2c v0.5.0; keep aligned with the Docker probe and README baseline.
+          git init "$RUNNER_TEMP/f2c"
+          git -C "$RUNNER_TEMP/f2c" remote add origin https://github.com/goroyabu/f2c.git
+          git -C "$RUNNER_TEMP/f2c" fetch --depth=1 origin ac0e647082d720a3da5e4442578f3a2c7a98d47c
+          git -C "$RUNNER_TEMP/f2c" checkout --detach ac0e647082d720a3da5e4442578f3a2c7a98d47c
+          test "$(git -C "$RUNNER_TEMP/f2c" rev-parse HEAD)" = ac0e647082d720a3da5e4442578f3a2c7a98d47c
           cmake -S "$RUNNER_TEMP/f2c" -B "$RUNNER_TEMP/f2c-build" \
             -G Ninja \
             -DNET_FETCH=ON \
@@ -53,7 +58,12 @@ jobs:
 
       - name: Build and install ugs
         run: |
-          git clone --depth=1 https://github.com/goroyabu/ugs.git "$RUNNER_TEMP/ugs"
+          # ugs v0.3.0; keep aligned with the Docker probe and README baseline.
+          git init "$RUNNER_TEMP/ugs"
+          git -C "$RUNNER_TEMP/ugs" remote add origin https://github.com/goroyabu/ugs.git
+          git -C "$RUNNER_TEMP/ugs" fetch --depth=1 origin d392fef5487dae6c08a058380d23dd427bcdfd35
+          git -C "$RUNNER_TEMP/ugs" checkout --detach d392fef5487dae6c08a058380d23dd427bcdfd35
+          test "$(git -C "$RUNNER_TEMP/ugs" rev-parse HEAD)" = d392fef5487dae6c08a058380d23dd427bcdfd35
           cmake -S "$RUNNER_TEMP/ugs" -B "$RUNNER_TEMP/ugs-build" \
             -G Ninja \
             -DNET_FETCH=ON \
