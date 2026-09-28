@@ -30,6 +30,32 @@ repurposed.
   documentation.
 - Do not silently replace external dependencies with bundled copies.
 
+### Updating the Dependency Baseline
+
+README records minimum supported wrapper versions separately from the exact
+release/commit combination used by CI and the Docker probe. To update it:
+
+1. Resolve the selected release tags to full commit IDs and inspect the fixes
+   relevant to td. Do not use a moving branch as the baseline.
+2. Update both `.github/workflows/ci.yml` and
+   `tests/docker-probe/ubuntu-ci.Dockerfile`, including release comments, and
+   the README table in the same change. Both acquisition paths fetch and verify
+   the exact commit before building.
+3. Change the versioned `find_package` requests in `CMakeLists.txt` only when
+   deliberately changing the support floor; record that decision in README.
+4. Build both dependencies into a fresh prefix and verify td's configure,
+   build, and full CTest suite. Rebuild the Docker image so a previously
+   installed dependency does not substitute for the selected baseline.
+5. Verify td with minimum CMake/CTest 3.21.7 and the new installed packages,
+   including installation. Check that older and unversioned packages are
+   rejected. Record actual environments, package versions, revisions, and
+   limitations in the PR.
+
+Dependency source builds use the normal environment's CMake before the
+minimum-CMake td check. The baseline does not pin system toolchains or expand
+the supported compiler/platform matrix. Successful process and PostScript
+tests do not establish visual or interactive correctness.
+
 ## Patch Policy
 
 - Treat the upstream archive contents as the source of truth. Do not commit
