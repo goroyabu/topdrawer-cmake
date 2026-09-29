@@ -1,5 +1,6 @@
 """Exercise the installed help file through TD_HELP and the installed td."""
 
+import errno
 import os
 import pty
 import select
@@ -37,8 +38,8 @@ def check_help(executable, help_file, work_dir, env):
             if ready:
                 try:
                     chunk = os.read(master, 4096)
-                except OSError:
-                    if process.poll() is not None:
+                except OSError as error:
+                    if error.errno == errno.EIO:
                         break
                     raise
                 if not chunk:
