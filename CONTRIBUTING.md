@@ -128,13 +128,15 @@ display-independent suite on Ubuntu 24.04 with GNU Fortran 13, macOS 15 arm64
 with GNU Fortran 15, and Ubuntu 24.04 with preverified archives and
 `NET_FETCH=OFF`. A separate Ubuntu 24.04 entry uses CMake/CTest 3.21.7. It
 verifies the official tool archive's SHA256, prints and checks both tool
-versions, runs configure/build/all CTest cases, and installs into a temporary
-prefix. All entries build the pinned f2c and UGS releases in a fresh prefix.
+versions and runs configure/build/all CTest cases. The installed-behavior
+cases use temporary prefixes in every entry. All entries build the pinned
+f2c and UGS releases in a fresh prefix.
 
 External dependencies are built with the runner's CMake before selecting the
 minimum version for `td`; their own source-build requirements are separate from
 the requirements for consuming their installed packages. The minimum entry
-checks installation execution, not installed runtime behavior or uninstall.
+also checks installed td PostScript output, installed help, and uninstall
+through CTest.
 When changing CMake commands or options, preserve compatibility with 3.21 and
 verify the affected paths with the minimum tool as well as the normal build.
 

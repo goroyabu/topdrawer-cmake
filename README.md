@@ -193,8 +193,8 @@ from a shell, or with a `.top` / `.tdr` script as input.
 
 ## Testing
 
-This repository includes a `CTest`-based test suite for the built `td`
-executable.
+This repository includes a `CTest`-based suite for built and installed `td`
+behavior. Python 3.8 or newer is required when tests are enabled.
 
 To configure with tests enabled:
 

@@ -1,10 +1,10 @@
 # Tests
 
-The suite checks representative maintenance behavior of the built `td`
-executable using non-interactive PostScript output. It is not an exhaustive
-Topdrawer language or graphics conformance suite. CMake/CTest 3.21 or newer
-and the normal build dependencies are required; no running X server or image
-renderer is required for these tests.
+The suite checks representative maintenance behavior of built and installed
+`td`. It is not an exhaustive Topdrawer language or graphics conformance suite.
+CMake/CTest 3.21 or newer, Python 3.8 or newer when testing is enabled, and the
+normal build dependencies are required. No running X server or image renderer
+is required.
 
 ## Running and Selecting Tests
 
@@ -25,6 +25,7 @@ ctest --test-dir build -L smoke --output-on-failure
 ctest --test-dir build -L postscript --output-on-failure
 ctest --test-dir build -L ps_structure --output-on-failure
 ctest --test-dir build -L command_output --output-on-failure
+ctest --test-dir build -L install --output-on-failure
 ```
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for change-specific verification and
@@ -38,12 +39,13 @@ f2c and UGS. Keep test registration in `tests/CMakeLists.txt` for now.
 - `archive_hash/`: archive selection and integrity tests, including their
   dedicated CMake runners. Inputs are generated in the build tree.
 - `legacy_helpers/`: direct upstream helper, ABI, and linkage probes.
+- `install/`: isolated installed-executable, help, and uninstall checks.
 - `cases/`: executable smoke inputs and expected text.
 - `postscript/fixtures/`: PostScript behavior inputs and companion data.
 - `cmake/`: shared runners for executable and PostScript cases.
 - `docker-probe/`: the Ubuntu verification environment.
 
-Add purpose-specific directories such as `source_preparation/` or `install/`
+Add purpose-specific directories such as `source_preparation/`
 when those tests are introduced; do not create empty placeholders. Group growing
 functional fixtures within `cases/` or `postscript/` by behavior rather than
 Issue number or implementation language. Keep dedicated scripts with their
@@ -52,9 +54,10 @@ cases do not need to move when a new suite is added.
 
 ## Current Guarantees and Limits
 
-The suite has 53 tests with GNU Fortran: 28 executable tests, 19 archive
-acquisition tests, and 6 helper contract tests. The helper tests are currently
-registered only for GNU Fortran; other compilers retain the 47 existing tests.
+The suite has 56 tests with GNU Fortran: 28 build-tree executable tests, 3
+installed-behavior tests, 19 archive acquisition tests, and 6 helper contract
+tests. The helper tests are currently registered only for GNU Fortran; other
+compilers retain 50 tests.
 PostScript tests also check execution status and known
 Topdrawer/UGS error messages; a successful process alone is insufficient.
 
@@ -66,6 +69,13 @@ Topdrawer/UGS error messages; a successful process alone is insufficient.
 | PostScript I/O | 9 | Expected file exists and is nonempty | Valid or correct drawing |
 | PostScript structure | 8 | Nonempty output plus PS header, BoundingBox, and showpage markers | Correct coordinates, labels, or glyphs |
 | Command-output comparison | 5 | Two outputs exist, are nonempty, and differ by SHA256 | That either drawing is visually correct |
+| Installed behavior | 3 | Installed td produces basic PS, TD_HELP loads installed help, and uninstall preserves unrelated files | Visual correctness or interactive X11 behavior |
+
+The three installed-behavior tests each install into a separate temporary
+`DESTDIR` and run from outside the source and build working directories. The
+help case uses a bounded pseudo-terminal session because Topdrawer processes
+`HELP` only in interactive mode. The tests preserve any existing build-tree
+install manifest and never remove a user installation.
 
 Fixtures cover basic plot/join/histogram, explicit output naming, external
 input and column order, coordinate titles, error bars, mixed windows/panels,
