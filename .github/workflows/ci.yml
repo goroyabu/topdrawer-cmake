@@ -57,7 +57,8 @@ jobs:
             libxaw7-dev \
             libxt-dev \
             libice-dev \
-            libsm-dev
+            libsm-dev \
+            python3
           echo "FC=$(command -v gfortran-13)" >> "$GITHUB_ENV"
           echo "CC=$(command -v gcc-13)" >> "$GITHUB_ENV"
           echo "TD_CMAKE_PREFIX_PATH=$RUNNER_TEMP/prefix" >> "$GITHUB_ENV"
@@ -192,7 +193,3 @@ jobs:
         run: |
           find "$RUNNER_TEMP" build -type f \( -name CMakeError.log -o -name CMakeConfigureLog.yaml -o -name LastTest.log \) \
             -print -exec tail -n 120 {} \; 2>/dev/null || true
-
-      - name: Install td with minimum CMake
-        if: matrix.cmake_version != ''
-        run: cmake --install build --prefix "$RUNNER_TEMP/td-install"

@@ -1,6 +1,22 @@
 set(TD_TEST_CASES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cases")
 set(TD_POSTSCRIPT_FIXTURES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/postscript/fixtures")
 
+find_package(Python3 3.8 COMPONENTS Interpreter REQUIRED)
+
+foreach(_check IN ITEMS postscript help uninstall)
+  add_test(
+    NAME "installed_td.${_check}"
+    COMMAND "${Python3_EXECUTABLE}" -B "${CMAKE_CURRENT_SOURCE_DIR}/install/${_check}.py"
+      --cmake "${CMAKE_COMMAND}"
+      --build-dir "${CMAKE_BINARY_DIR}"
+      --input "${TD_POSTSCRIPT_FIXTURES_DIR}/basic_plot_points.top"
+      --bindir "${CMAKE_INSTALL_BINDIR}"
+      --datarootdir "${CMAKE_INSTALL_DATAROOTDIR}"
+  )
+  set_tests_properties("installed_td.${_check}" PROPERTIES
+    LABELS install RUN_SERIAL TRUE TIMEOUT 60)
+endforeach()
+
 function(add_td_smoke_case case_name)
   set(options)
   set(oneValueArgs INPUT_FILE EXPECTED_FILE)

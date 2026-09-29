@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxmu-dev \
     libxt-dev \
     ninja-build \
+    python3 \
   && rm -rf /var/lib/apt/lists/*
 
 # f2c v0.5.0; keep aligned with CI and the README baseline.

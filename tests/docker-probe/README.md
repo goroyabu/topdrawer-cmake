@@ -16,11 +16,11 @@ The default probe:
   builds and installs them (see the [baseline table](../../README.md#dependency-baseline));
 - configures this repository with `BUILD_TESTING=ON`;
 - builds `td`;
-- runs `ctest --test-dir /tmp/td-build --output-on-failure`.
+- runs `ctest --test-dir /tmp/td-build --output-on-failure`, including the
+  installed-behavior checks in isolated temporary prefixes.
 
-It does not run `cmake --install` by default. Run an install check separately
-when changing install rules, install layout, runtime assets, or packaging
-behavior.
+The installed-behavior checks use Python 3 and cover the executable, help
+asset, and uninstall without changing the probe's dependency installation.
 
 ## Prerequisites
 
@@ -80,17 +80,12 @@ It is also useful as a pre-PR confidence check for broader maintenance changes.
 
 ## Install-Sensitive Changes
 
-For install-related changes, run the default probe first. Then use the debug
-shell or an explicit command override to run an install check with a temporary
-prefix, for example:
+The default probe includes the three installation checks. To run only those
+checks after building td in the debug shell, use:
 
 ```sh
-docker compose -f tests/docker-probe/compose.yml run --rm ci /bin/bash -lc \
-  'cmake -S /work -B /tmp/td-build -G Ninja -DNET_FETCH=ON -DBUILD_TESTING=ON -DCMAKE_PREFIX_PATH="${CI_PREFIX}" && cmake --build /tmp/td-build --parallel && cmake --install /tmp/td-build --prefix /tmp/td-install'
+ctest --test-dir /tmp/td-build -L install --output-on-failure
 ```
-
-Install verification is intentionally separate so the default probe stays
-focused on the CI-equivalent configure, build, and CTest path.
 
 ## Limitations
 
@@ -98,5 +93,5 @@ focused on the CI-equivalent configure, build, and CTest path.
 - Docker is not required for normal user builds.
 - The image build depends on network access unless Docker layers are already
   cached.
-- The probe does not test interactive X11 behavior.
-- The default command does not verify install layout or installed runtime assets.
+- The installed-behavior checks do not establish visual correctness or
+  interactive X11 behavior.

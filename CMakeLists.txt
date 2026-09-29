@@ -156,8 +156,9 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
 
-install(FILES "${TOPDRAWER_SOURCE_ROOT}/topdrawer.gih"
-    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/td")
+install(FILES "${TOPDRAWER_SOURCE_ROOT}/doc/topdrawer4.0.gih"
+    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/td"
+    RENAME topdrawer.gih)
 
 # ---------------------------------------------------------------------------
 # Uninstall target
