@@ -294,4 +294,8 @@ and change discipline.
 
 ## License
 
-This repository is distributed under the MIT License. See `LICENSE` for details.
+Repository-maintained work is covered by the [MIT License](LICENSE) to the
+extent its authors can license it. The downloaded Topdrawer sources, embedded
+third-party components, and files built from those sources are not relicensed
+by that license. See [Third-Party Notices and Provenance](THIRD_PARTY_NOTICES.md)
+for the pinned upstream archive, its notices, and unresolved terms.
