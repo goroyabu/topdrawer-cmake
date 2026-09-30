@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(td VERSION 0.2.0 LANGUAGES C Fortran)
+project(td VERSION 0.3.0 LANGUAGES C Fortran)
 
 # ------------------------------------------------------------
 # Options
