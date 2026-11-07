@@ -292,6 +292,13 @@ and change discipline.
 
 ---
 
+## Security
+
+For suspected security vulnerabilities, see [SECURITY.md](SECURITY.md)
+for the private reporting process. Do not open a public Issue.
+
+---
+
 ## License
 
 Repository-maintained work is covered by the [MIT License](LICENSE) to the
