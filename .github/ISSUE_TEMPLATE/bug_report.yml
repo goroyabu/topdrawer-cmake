@@ -1,0 +1,109 @@
+name: Bug report
+description: Report a reproducible problem in the td build, installation, execution, or output
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use a short `<area>: <summary>` title, such as `build: fix compiler detection`.
+        Do not include secrets or unrelated private data in inputs, logs, or screenshots.
+        Report suspected security vulnerabilities privately through the [Security page](https://github.com/goroyabu/topdrawer-cmake/security), following [SECURITY.md](https://github.com/goroyabu/topdrawer-cmake/blob/main/SECURITY.md).
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem and expected behavior
+      description: Describe what went wrong, what you expected, and whether the problem occurs during setup, building, installation, testing, or running td.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest reliable sequence that reproduces the problem. Include relevant CMake options if you built td, the actual td command, and the working directory for runtime problems. If using an existing installation, describe how it was obtained.
+      placeholder: |
+        1. Configure/build or obtain td with ...
+        2. Run from ... using ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: topdrawer-input
+    attributes:
+      label: Minimal Topdrawer input and data
+      description: For execution or output problems, paste or attach the smallest .top or .tdr input and any required data files. Preserve filenames used by the commands. Use synthetic data where possible and omit this field for unrelated build or installation problems.
+
+  - type: input
+    id: version
+    attributes:
+      label: td wrapper release or commit
+      description: Identify this CMake wrapper's release or commit, not the upstream Topdrawer version. If unknown, say so and describe the installation source in the reproduction steps.
+      placeholder: v0.3.0 or a commit identifier
+    validations:
+      required: true
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system and CPU architecture
+      placeholder: Ubuntu 24.04 x86_64, macOS 15 arm64, or the environment used
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: f2c and UGS wrapper versions
+      description: If known, provide the installed f2c and UGS wrapper releases or commits and any relevant CMAKE_PREFIX_PATH settings. These are wrapper versions, not the original upstream versions. Omit unknown details when using an existing td installation.
+
+  - type: input
+    id: compiler
+    attributes:
+      label: C and Fortran compilers and versions
+      description: Include both compilers for build problems. Leave blank if unknown or unrelated to an existing installation.
+      placeholder: Apple Clang and GNU Fortran 15, or the compilers used
+
+  - type: input
+    id: cmake
+    attributes:
+      label: CMake version and generator
+      description: Include these for configure, build, or installation problems if known.
+      placeholder: CMake 3.21.7 with Ninja, or the tools used
+
+  - type: dropdown
+    id: net-fetch
+    attributes:
+      label: Source acquisition mode
+      description: Select the td NET_FETCH setting if relevant. ON permits fetching but can still use a local or cached archive.
+      options:
+        - NET_FETCH=ON
+        - NET_FETCH=OFF
+        - Not applicable or unknown
+
+  - type: textarea
+    id: archive-context
+    attributes:
+      label: Archive acquisition details
+      description: For acquisition or integrity problems, include the archive path selected in the output, relevant ARCHIVE_DIR or DOWNLOAD_CACHE_DIR settings, and whether TD_ALLOW_UNVERIFIED_ARCHIVES was enabled. Remove private path details without obscuring the failure.
+
+  - type: textarea
+    id: display-and-output
+    attributes:
+      label: Output device and display environment
+      description: For runtime problems, identify the selected device and how it was selected, the expected and actual output filenames, and whether output is missing or visually incorrect. For X11 problems, include the X server (XQuartz, Xvfb, etc.), relevant DISPLAY settings, and whether SSH forwarding is involved. Remove private host information.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Paste relevant configure, build, test, or runtime output, including Topdrawer or UGS diagnostics even if the process exits successfully. Remove private data first.
+      render: text
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add relevant details not covered above. For installed-help problems, include the installation prefix, working directory, and whether TD_HELP is set and points to the installed topdrawer.gih file. Remove private path details.
